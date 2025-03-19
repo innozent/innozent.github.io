@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Learning Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none;
+        }
+        .question.active {
+            display: block;
+        }
+        .options {
+            margin-top: 10px;
+        }
+        .option {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        .option.selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .option.correct {
+            background-color: #c8e6c9;
+            border-color: #4caf50;
+        }
+        .option.incorrect {
+            background-color: #ffcdd2;
+            border-color: #f44336;
+        }
+        .navigation {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2196f3;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1976d2;
+        }
+        button:disabled {
+            background-color: #bdbdbd;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .score {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .correct-feedback {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .incorrect-feedback {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .explanation {
+            margin-top: 10px;
+            font-weight: normal;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Deep Learning Quiz</h1>
+        <div class="progress">Question <span id="current-question">1</span> of <span id="total-questions">0</span></div>
+        <div id="questions"></div>
+        <div class="navigation">
+            <button id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+            <button id="next-btn" onclick="nextQuestion()">Next</button>
+            <button id="submit-btn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
+        </div>
+        <div class="score" id="score"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the main difference between supervised and unsupervised learning?",
+                options: [
+                    "Supervised learning uses labeled data, while unsupervised learning uses unlabeled data",
+                    "Supervised learning is faster than unsupervised learning",
+                    "Unsupervised learning always gives better results",
+                    "There is no difference between them"
+                ],
+                correct: 0,
+                explanation: "Supervised learning requires labeled data where each training example has a known output, while unsupervised learning works with unlabeled data to find patterns and structures."
+            },
+            {
+                question: "What is the primary purpose of an autoencoder?",
+                options: [
+                    "To reduce dimensionality and learn efficient data representations",
+                    "To generate random numbers",
+                    "To perform regression",
+                    "To classify images"
+                ],
+                correct: 0,
+                explanation: "Autoencoders are neural networks designed to learn efficient data representations by compressing input data into a lower-dimensional latent space and then reconstructing it."
+            },
+            {
+                question: "Which of the following is NOT a type of autoencoder?",
+                options: [
+                    "Vanilla Autoencoder",
+                    "Regression Autoencoder",
+                    "Multi-layer Autoencoder",
+                    "Convolutional Autoencoder"
+                ],
+                correct: 1,
+                explanation: "Regression Autoencoder is not a standard type of autoencoder. The common types include Vanilla, Multi-layer, Convolutional, and Variational Autoencoders."
+            },
+            {
+                question: "What is the role of the encoder in an autoencoder?",
+                options: [
+                    "To perform regression",
+                    "To classify the input data",
+                    "To generate new data",
+                    "To compress input data into a latent space"
+                ],
+                correct: 3,
+                explanation: "The encoder's primary function is to compress the input data into a lower-dimensional representation called the latent space. This compression helps in learning efficient features and reducing dimensionality."
+            },
+            {
+                question: "Which activation function is typically used in the output layer of a regression model?",
+                options: [
+                    "Linear (no activation)",
+                    "Sigmoid",
+                    "ReLU",
+                    "Tanh"
+                ],
+                correct: 0,
+                explanation: "For regression tasks, a linear activation function (or no activation) is typically used in the output layer because we want to predict continuous values without any constraints on the range."
+            },
+            {
+                question: "What is the main application of autoencoders in image processing?",
+                options: [
+                    "Object detection",
+                    "Image classification",
+                    "Image segmentation",
+                    "Image denoising and dimensionality reduction"
+                ],
+                correct: 3,
+                explanation: "Autoencoders are particularly effective in image denoising and dimensionality reduction because they can learn to reconstruct clean images from noisy inputs and compress high-dimensional image data into a lower-dimensional representation."
+            },
+            {
+                question: "Which loss function is commonly used for binary classification tasks?",
+                options: [
+                    "Mean Squared Error",
+                    "Huber Loss",
+                    "Categorical Cross-Entropy",
+                    "Binary Cross-Entropy"
+                ],
+                correct: 3,
+                explanation: "Binary Cross-Entropy is the standard loss function for binary classification because it's specifically designed for two-class problems and provides better gradient properties than other loss functions for this task."
+            },
+            {
+                question: "What is the purpose of the decoder in an autoencoder?",
+                options: [
+                    "To compress the input data",
+                    "To perform feature extraction",
+                    "To classify the input data",
+                    "To reconstruct the input from the latent representation"
+                ],
+                correct: 3,
+                explanation: "The decoder's role is to reconstruct the input data from the compressed latent representation. It works in conjunction with the encoder to learn how to effectively compress and decompress the data."
+            },
+            {
+                question: "Which of the following is an application of unsupervised learning?",
+                options: [
+                    "Price prediction",
+                    "Customer segmentation",
+                    "Image classification",
+                    "Spam detection"
+                ],
+                correct: 1,
+                explanation: "Customer segmentation is a classic example of unsupervised learning where we group customers based on their behavior patterns without predefined labels, unlike the other options which are supervised learning tasks."
+            },
+            {
+                question: "What is the main advantage of using a multi-layer autoencoder over a vanilla autoencoder?",
+                options: [
+                    "It's easier to implement",
+                    "It uses less memory",
+                    "It's faster to train",
+                    "It can learn more complex features"
+                ],
+                correct: 3,
+                explanation: "Multi-layer autoencoders can learn more complex features because they have multiple layers of non-linear transformations, allowing them to capture hierarchical patterns in the data that a single-layer autoencoder cannot."
+            },
+            {
+                question: "In a regularized autoencoder, what is the purpose of randomly setting input nodes to zero?",
+                options: [
+                    "To speed up training",
+                    "To make the model simpler",
+                    "To reduce memory usage",
+                    "To prevent overfitting and improve generalization"
+                ],
+                correct: 3,
+                explanation: "Randomly setting input nodes to zero (dropout) in a regularized autoencoder helps prevent overfitting by forcing the network to learn robust features that don't rely on any single input node."
+            },
+            {
+                question: "What is the key characteristic of a Convolutional Autoencoder?",
+                options: [
+                    "It can only work with text data",
+                    "It's faster than other autoencoders",
+                    "It uses only fully connected layers",
+                    "It uses convolutional layers for both encoding and decoding"
+                ],
+                correct: 3,
+                explanation: "Convolutional Autoencoders use convolutional layers for both encoding and decoding, which makes them particularly effective for processing image data by preserving spatial relationships in the data."
+            },
+            {
+                question: "Which of the following is NOT a common application of autoencoders?",
+                options: [
+                    "Image classification",
+                    "Dimensionality reduction",
+                    "Anomaly detection",
+                    "Data denoising"
+                ],
+                correct: 0,
+                explanation: "While autoencoders can be used for feature extraction in classification tasks, direct image classification is not their primary application. They are more commonly used for dimensionality reduction, anomaly detection, and data denoising."
+            },
+            {
+                question: "What is the main difference between a vanilla autoencoder and a variational autoencoder (VAE)?",
+                options: [
+                    "VAE is faster to train",
+                    "VAE is simpler to implement",
+                    "VAE can only work with images",
+                    "VAE learns a probabilistic distribution in the latent space"
+                ],
+                correct: 3,
+                explanation: "The key difference is that VAEs learn a probabilistic distribution in the latent space, allowing them to generate new samples by sampling from this distribution, unlike vanilla autoencoders which learn a deterministic mapping."
+            },
+            {
+                question: "In the context of autoencoders, what is the 'latent space'?",
+                options: [
+                    "The input layer",
+                    "The output layer",
+                    "The training data",
+                    "The compressed representation of the input data"
+                ],
+                correct: 3,
+                explanation: "The latent space is the compressed representation of the input data learned by the encoder. It contains the essential features of the input data in a lower-dimensional form."
+            },
+            {
+                question: "What is the purpose of using the MNIST dataset in autoencoder examples?",
+                options: [
+                    "It's the only dataset that works with autoencoders",
+                    "It's the most complex dataset available",
+                    "It's faster to train on",
+                    "It's a simple dataset that demonstrates dimensionality reduction well"
+                ],
+                correct: 3,
+                explanation: "MNIST is commonly used in autoencoder examples because it's a simple, well-structured dataset that clearly demonstrates the dimensionality reduction capabilities of autoencoders, making it ideal for educational purposes."
+            },
+            {
+                question: "Which of the following is a key component of a multilayer perceptron?",
+                options: [
+                    "Only output layer",
+                    "Only hidden layers",
+                    "Only input and output layers",
+                    "Input layer, hidden layers, and output layer"
+                ],
+                correct: 3,
+                explanation: "A multilayer perceptron consists of three main components: an input layer that receives the data, one or more hidden layers that process the information, and an output layer that produces the final prediction."
+            },
+            {
+                question: "What is the role of activation functions in neural networks?",
+                options: [
+                    "To make the network faster",
+                    "To reduce memory usage",
+                    "To make the network simpler",
+                    "To introduce non-linearity into the network"
+                ],
+                correct: 3,
+                explanation: "Activation functions introduce non-linearity into the network, allowing it to learn complex patterns and relationships in the data that linear transformations alone cannot capture."
+            },
+            {
+                question: "Which of the following is NOT a common activation function?",
+                options: [
+                    "ReLU",
+                    "Sigmoid",
+                    "Linear",
+                    "Random"
+                ],
+                correct: 3,
+                explanation: "Random is not a valid activation function. Common activation functions include ReLU, Sigmoid, Tanh, and Linear, each with specific properties suitable for different types of neural networks."
+            },
+            {
+                question: "What is the purpose of the validation split in training?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To evaluate model performance on unseen data"
+                ],
+                correct: 3,
+                explanation: "The validation split is used to evaluate the model's performance on unseen data during training, helping to detect overfitting and determine when to stop training."
+            },
+            {
+                question: "What is the main purpose of using TensorBoard in deep learning?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To visualize training metrics and model architecture"
+                ],
+                correct: 3,
+                explanation: "TensorBoard is a visualization tool that helps developers monitor and visualize various aspects of deep learning models, including training metrics, model architecture, and parameter distributions."
+            },
+            {
+                question: "Which of the following is a common hyperparameter in neural networks?",
+                options: [
+                    "The color of the output",
+                    "The font size of the code",
+                    "The computer's screen resolution",
+                    "The learning rate"
+                ],
+                correct: 3,
+                explanation: "The learning rate is a crucial hyperparameter that controls how quickly the model learns from the training data. It's one of the most important parameters to tune in neural networks."
+            },
+            {
+                question: "What is the purpose of early stopping in training?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To prevent overfitting"
+                ],
+                correct: 3,
+                explanation: "Early stopping is a regularization technique that prevents overfitting by stopping the training process when the model's performance on the validation set starts to degrade."
+            },
+            {
+                question: "What is the main difference between the Sequential and Functional API in Keras?",
+                options: [
+                    "The Sequential API is faster",
+                    "The Sequential API uses less memory",
+                    "The Functional API is simpler to use",
+                    "The Functional API allows for more complex model architectures"
+                ],
+                correct: 3,
+                explanation: "The Functional API allows for more complex model architectures with multiple inputs/outputs, shared layers, and branching paths, while the Sequential API is limited to linear stacks of layers."
+            },
+            {
+                question: "What is the purpose of the StandardScaler in data preprocessing?",
+                options: [
+                    "To make the data more colorful",
+                    "To reduce memory usage",
+                    "To make the data simpler",
+                    "To standardize features to have mean=0 and variance=1"
+                ],
+                correct: 3,
+                explanation: "StandardScaler normalizes the features to have a mean of 0 and a standard deviation of 1, which helps in training neural networks by ensuring all features are on the same scale."
+            },
+            {
+                question: "What is the main purpose of using dropout in neural networks?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To prevent overfitting"
+                ],
+                correct: 3,
+                explanation: "Dropout is a regularization technique that randomly deactivates neurons during training to prevent overfitting by making the network more robust and less dependent on any single neuron."
+            },
+            {
+                question: "What is the purpose of the batch size parameter?",
+                options: [
+                    "To determine the size of the output",
+                    "To determine the size of the input",
+                    "To control the learning rate",
+                    "To control how many samples are processed before updating the model"
+                ],
+                correct: 3,
+                explanation: "The batch size determines how many samples are processed before updating the model's weights. It affects both training speed and model generalization."
+            },
+            {
+                question: "What is the main advantage of using the Adam optimizer?",
+                options: [
+                    "It's the fastest optimizer",
+                    "It uses the least memory",
+                    "It's the simplest to implement",
+                    "It adapts the learning rate for each parameter"
+                ],
+                correct: 3,
+                explanation: "Adam optimizer combines the benefits of RMSprop and momentum by adapting the learning rate for each parameter individually, making it effective for most deep learning tasks."
+            },
+            {
+                question: "What is the purpose of the train_test_split function?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the data simpler",
+                    "To split data into training and testing sets"
+                ],
+                correct: 3,
+                explanation: "train_test_split is used to divide the dataset into training and testing sets, which is crucial for evaluating the model's performance on unseen data."
+            },
+            {
+                question: "What is the main purpose of using the Sequential model in Keras?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To create simple, linear stack of layers"
+                ],
+                correct: 3,
+                explanation: "The Sequential model in Keras is designed for creating simple neural networks with a linear stack of layers, making it ideal for straightforward architectures."
+            },
+            {
+                question: "What is the purpose of the Dense layer in neural networks?",
+                options: [
+                    "To make the network faster",
+                    "To reduce memory usage",
+                    "To make the network simpler",
+                    "To perform linear transformations and apply activation functions"
+                ],
+                correct: 3,
+                explanation: "Dense layers perform linear transformations on the input data and apply activation functions, making them fundamental building blocks of neural networks."
+            },
+            {
+                question: "What is the main purpose of using the compile method in Keras?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To configure the learning process"
+                ],
+                correct: 3,
+                explanation: "The compile method configures the learning process by specifying the optimizer, loss function, and metrics to be used during training."
+            },
+            {
+                question: "What is the purpose of the fit method in Keras?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To train the model for a fixed number of epochs"
+                ],
+                correct: 3,
+                explanation: "The fit method is used to train the model for a specified number of epochs, handling the training loop and validation process."
+            },
+            {
+                question: "What is the main purpose of using the predict method?",
+                options: [
+                    "To make predictions faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To generate predictions for input samples"
+                ],
+                correct: 3,
+                explanation: "The predict method is used to generate predictions for new input samples using the trained model."
+            },
+            {
+                question: "What is the purpose of the summary method in Keras?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To display the model architecture"
+                ],
+                correct: 3,
+                explanation: "The summary method displays a detailed overview of the model's architecture, including layer types, shapes, and parameter counts."
+            },
+            {
+                question: "What is the main purpose of using the reshape operation?",
+                options: [
+                    "To make data more colorful",
+                    "To reduce memory usage",
+                    "To make the data simpler",
+                    "To change the shape of arrays without changing their data"
+                ],
+                correct: 3,
+                explanation: "The reshape operation changes the shape of arrays while preserving their data, which is essential for preparing data in the correct format for different types of neural network layers."
+            },
+            {
+                question: "What is the purpose of the astype method in data preprocessing?",
+                options: [
+                    "To make data more colorful",
+                    "To reduce memory usage",
+                    "To make the data simpler",
+                    "To cast arrays to a specified type"
+                ],
+                correct: 3,
+                explanation: "The astype method is used to convert arrays to a specified data type, which is important for ensuring data compatibility with different operations and neural network requirements."
+            },
+            {
+                question: "What is the main purpose of using the validation_data parameter in model.fit?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To evaluate the model on validation data during training"
+                ],
+                correct: 3,
+                explanation: "The validation_data parameter allows you to evaluate the model's performance on a separate validation set during training, helping to monitor for overfitting."
+            },
+            {
+                question: "What is the purpose of the shuffle parameter in model.fit?",
+                options: [
+                    "To make training faster",
+                    "To reduce memory usage",
+                    "To make the model simpler",
+                    "To shuffle the training data before each epoch"
+                ],
+                correct: 3,
+                explanation: "The shuffle parameter determines whether to shuffle the training data before each epoch, which helps prevent the model from learning order-dependent patterns in the data."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let quizSubmitted = false;
+        let shuffledOptions = new Array(questions.length).fill(null);
+        let showFeedback = false;
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function displayQuestion(index) {
+            const questionsDiv = document.getElementById('questions');
+            questionsDiv.innerHTML = '';
+            
+            document.getElementById('total-questions').textContent = questions.length;
+            
+            questions.forEach((q, i) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = `question ${i === index ? 'active' : ''}`;
+                
+                if (!shuffledOptions[i]) {
+                    shuffledOptions[i] = shuffleArray([...q.options]);
+                }
+                
+                const isCorrect = userAnswers[i] !== null && 
+                    shuffledOptions[i][userAnswers[i]] === q.options[q.correct];
+                
+                questionDiv.innerHTML = `
+                    <h3>${q.question}</h3>
+                    <div class="options">
+                        ${shuffledOptions[i].map((option, j) => `
+                            <div class="option ${userAnswers[i] === j ? 'selected' : ''} 
+                                         ${userAnswers[i] !== null ? (j === shuffledOptions[i].indexOf(q.options[q.correct]) ? 'correct' : userAnswers[i] === j ? 'incorrect' : '') : ''}"
+                                 onclick="selectOption(${i}, ${j})">
+                                ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${userAnswers[i] !== null ? `
+                        <div class="feedback ${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">
+                            ${isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+                            <div class="explanation">${q.explanation}</div>
+                        </div>
+                    ` : ''}
+                `;
+                
+                questionsDiv.appendChild(questionDiv);
+            });
+
+            document.getElementById('current-question').textContent = index + 1;
+            document.getElementById('prev-btn').disabled = index === 0;
+            document.getElementById('next-btn').style.display = index === questions.length - 1 ? 'none' : 'block';
+            document.getElementById('submit-btn').style.display = index === questions.length - 1 ? 'block' : 'none';
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            if (userAnswers[questionIndex] !== null) return; // Prevent changing answer after selection
+            userAnswers[questionIndex] = optionIndex;
+            displayQuestion(currentQuestion);
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayQuestion(currentQuestion);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                displayQuestion(currentQuestion);
+            }
+        }
+
+        function submitQuiz() {
+            quizSubmitted = true;
+            const score = userAnswers.filter((answer, index) => 
+                shuffledOptions[index][answer] === questions[index].options[questions[index].correct]
+            ).length;
+            const percentage = (score / questions.length) * 100;
+            
+            document.getElementById('score').innerHTML = `
+                <h2>Quiz Complete!</h2>
+                <p>Your score: ${score} out of ${questions.length} (${percentage.toFixed(1)}%)</p>
+            `;
+            
+            displayQuestion(currentQuestion);
+        }
+
+        // Initialize the quiz
+        displayQuestion(0);
+    </script>
+</body>
+</html> 
