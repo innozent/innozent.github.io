@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsightGenie Project Gantt Chart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.5rem;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin: 5px 0;
+            padding: 5px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        #gantt-chart {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+        .gantt-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: white;
+            display: flex;
+            margin-bottom: 0;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 0;
+            min-width: 1200px;
+        }
+        .gantt-header-label {
+            width: 240px;
+            font-weight: bold;
+            padding: 5px;
+            background: white;
+            position: sticky;
+            left: 0;
+            z-index: 20;
+        }
+        .gantt-header-timeline {
+            flex: 1;
+            display: flex;
+            overflow-x: visible;
+            min-width: 0;
+            position: relative;
+        }
+        .gantt-day {
+            min-width: 20px;
+            text-align: center;
+            padding: 5px 0;
+            flex-shrink: 0;
+            position: relative;
+            width: 20px;
+        }
+        .gantt-week {
+            min-width: 70px;
+            text-align: center;
+            padding: 5px 0;
+            flex-shrink: 0;
+            position: relative;
+            background-color: #f5f5f5;
+            border-right: 1px solid #ddd;
+            font-size: 0.75rem;
+        }
+        .gantt-day:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .gantt-month-separator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            border-left: 2px solid #2c3e50;
+        }
+        .gantt-month-label {
+            font-size: 0.75rem;
+            padding: 2px 4px;
+        }
+        .gantt-row {
+            display: flex;
+            margin-bottom: 5px;
+            align-items: center;
+            min-width: 1200px;
+        }
+        .gantt-section {
+            position: sticky;
+            left: 0;
+            z-index: 15;
+            background-color: #2c3e50;
+            color: white;
+            margin-top: 0;
+            margin-bottom: 0;
+            min-width: 1200px;
+            display: flex;
+            padding: 5px;
+        }
+        .gantt-section::before {
+            content: attr(data-name);
+            margin-left: 240px;
+        }
+        .gantt-label {
+            width: 240px;
+            padding: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: white;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        .gantt-timeline {
+            flex: 1;
+            display: flex;
+            position: relative;
+            min-height: 30px;
+            min-width: 0;
+            overflow: visible;
+        }
+        .gantt-bar-wrapper {
+            position: absolute;
+            top: 5px;
+            height: 20px;
+            max-width: 100%;
+        }
+        .gantt-bar {
+            width: 100%;
+            height: 100%;
+            border-radius: 3px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .gantt-bar-milestone {
+            height: 20px;
+            width: 20px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            transform: translateX(-10px);
+        }
+        .gantt-bar-label {
+            font-size: 0.75rem;
+        }
+        .gantt-bar-project-initiation {
+            background-color: #3498db;
+        }
+        .gantt-bar-development {
+            background-color: #2ecc71;
+        }
+        .gantt-bar-testing {
+            background-color: #f1c40f;
+        }
+        .gantt-bar-uat-deployment {
+            background-color: #9b59b6;
+        }
+        .gantt-bar-warranty {
+            background-color: #e67e22;
+        }
+        .milestone {
+            position: relative;
+        }
+        .milestone-marker {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid red;
+        }
+        .legend-item {
+            margin: 0 8px;
+            font-size: 0.75rem;
+        }
+        .legend-color {
+            width: 20px;
+            height: 15px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+        .legend-milestone {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+        }
+        button {
+            margin: 0 5px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+        }
+        .task-info {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .task-info h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .task-info p {
+            margin: 5px 0;
+        }
+        @media (max-width: 768px) {
+            .gantt-header-label, .gantt-label {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Project Gantt Chart</h1>
+        
+        <div class="controls">
+            <button id="zoom-in">Zoom In</button>
+            <button id="zoom-out">Zoom Out</button>
+            <button id="reset">Reset</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #3498db;"></div>
+                <span>Project Initiation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #2ecc71;"></div>
+                <span>Development</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f1c40f;"></div>
+                <span>Testing</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #9b59b6;"></div>
+                <span>UAT & Deployment</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e67e22;"></div>
+                <span>Warranty</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-milestone"></div>
+                <span>Milestone</span>
+            </div>
+        </div>
+        
+        <div id="gantt-chart">
+            <!-- Gantt chart will be generated here -->
+        </div>
+        
+        <div id="task-info" class="task-info">
+            <h3 id="task-title"></h3>
+            <p><strong>Start:</strong> <span id="task-start"></span></p>
+            <p><strong>End:</strong> <span id="task-end"></span></p>
+            <p><strong>Duration:</strong> <span id="task-duration"></span> days</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Project start date
+            const startDate = new Date('2025-03-25');
+            const endDate = new Date('2025-09-25'); // Including warranty period
+            
+            // Configuration
+            let dayWidth = 20; // Initial width of day cells in pixels
+            const minDayWidth = 10;
+            const maxDayWidth = 40;
+            
+            // Tasks data
+            const sections = [
+                {
+                    name: "Project Initiation",
+                    tasks: [
+                        { id: "m1", name: "Contract Signing & Kickoff", start: "2025-03-25", duration: 0, milestone: true },
+                        { id: "ra", name: "Requirements Analysis", start: "2025-03-25", duration: 3 },
+                        { id: "sad", name: "System Architecture Design", start: "2025-03-28", duration: 2, dependencies: ["ra"] },
+                        { id: "dsd", name: "Database Schema Design", start: "2025-03-30", duration: 1, dependencies: ["sad"] },
+                        { id: "ui", name: "UI/UX Specifications", start: "2025-03-28", duration: 2, dependencies: ["ra"] },
+                        { id: "dd", name: "Design Documentation", start: "2025-03-30", duration: 1, dependencies: ["ui"] }
+                    ]
+                },
+                {
+                    name: "Development",
+                    tasks: [
+                        { id: "sde", name: "Setup Development Environment", start: "2025-04-01", duration: 1, dependencies: ["dd"] },
+                        { id: "be", name: "Backend Services & APIs", start: "2025-04-02", duration: 15, dependencies: ["sde"] },
+                        { id: "fe", name: "Frontend Components", start: "2025-04-02", duration: 20, dependencies: ["sde"] },
+                        { id: "dbo", name: "Database Operations", start: "2025-04-17", duration: 7, dependencies: ["be"] },
+                        { id: "sai", name: "Statistical Analysis Integration", start: "2025-04-17", duration: 10, dependencies: ["be"] },
+                        { id: "slm", name: "Self-learning Module", start: "2025-04-22", duration: 7, dependencies: ["fe"] },
+                        { id: "sem", name: "Self-evaluation Module", start: "2025-04-22", duration: 7, dependencies: ["fe"] },
+                        { id: "admin", name: "Admin Configuration & User Mgmt", start: "2025-04-22", duration: 10, dependencies: ["fe"] },
+                        { id: "m3", name: "Development Completion", start: "2025-05-02", duration: 0, milestone: true, dependencies: ["dbo", "sai", "slm", "sem", "admin"] }
+                    ]
+                },
+                {
+                    name: "Testing",
+                    tasks: [
+                        { id: "ut", name: "Unit Testing", start: "2025-04-22", duration: 10, dependencies: ["be", "fe"] },
+                        { id: "it", name: "Integration Testing", start: "2025-05-02", duration: 7, dependencies: ["ut"] },
+                        { id: "st", name: "System Testing", start: "2025-05-09", duration: 7, dependencies: ["it"] },
+                        { id: "pst", name: "Performance & Security Testing", start: "2025-05-16", duration: 5, dependencies: ["st"] },
+                        { id: "m4", name: "Internal Testing Completion", start: "2025-05-21", duration: 0, milestone: true, dependencies: ["pst"] }
+                    ]
+                },
+                {
+                    name: "UAT & Deployment",
+                    tasks: [
+                        { id: "utc", name: "Prepare UAT Test Cases", start: "2025-05-22", duration: 3, dependencies: ["m4"] },
+                        { id: "uat", name: "User Acceptance Testing", start: "2025-05-25", duration: 14, dependencies: ["utc"] },
+                        { id: "ir", name: "Issue Resolution", start: "2025-06-08", duration: 7, dependencies: ["uat"] },
+                        { id: "m5", name: "UAT Completion", start: "2025-06-15", duration: 0, milestone: true, dependencies: ["ir"] },
+                        { id: "deploy", name: "AWS Deployment", start: "2025-06-16", duration: 3, dependencies: ["m5"] },
+                        { id: "fv", name: "Final Verification", start: "2025-06-19", duration: 2, dependencies: ["deploy"] },
+                        { id: "m6", name: "Project Handover", start: "2025-06-21", duration: 0, milestone: true, dependencies: ["fv"] }
+                    ]
+                },
+                {
+                    name: "Warranty",
+                    tasks: [
+                        { id: "warranty", name: "Warranty Period", start: "2025-06-22", duration: 90, dependencies: ["m6"] }
+                    ]
+                }
+            ];
+            
+            // Calculate days between two dates
+            function daysBetween(date1, date2) {
+                const oneDay = 24 * 60 * 60 * 1000;
+                return Math.round(Math.abs((date1 - date2) / oneDay));
+            }
+            
+            // Format date as YYYY-MM-DD
+            function formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+            
+            // Get date by adding days to a date
+            function addDays(date, days) {
+                const result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            }
+            
+            // Generate Gantt chart
+            function generateGanttChart() {
+                const ganttChart = document.getElementById('gantt-chart');
+                ganttChart.innerHTML = '';
+                
+                // Calculate total days in the project
+                const totalDays = daysBetween(startDate, endDate) + 1;
+                
+                // Create header
+                const headerRow = document.createElement('div');
+                headerRow.className = 'gantt-header';
+                
+                const headerLabel = document.createElement('div');
+                headerLabel.className = 'gantt-header-label';
+                headerLabel.textContent = 'Task Name';
+                headerRow.appendChild(headerLabel);
+                
+                const headerTimeline = document.createElement('div');
+                headerTimeline.className = 'gantt-header-timeline';
+                
+                // Generate weeks for header
+                let monthCounter = 1;
+                let weekCounter = 1;
+                for (let i = 0; i < totalDays; i += 7) {
+                    const weekElement = document.createElement('div');
+                    weekElement.className = 'gantt-week';
+                    const weekWidth = Math.max(70, dayWidth * 7); // Ensure minimum width of 70px
+                    weekElement.style.width = `${weekWidth}px`;
+                    weekElement.textContent = `Week ${weekCounter}`;
+                    
+                    // Add month separator every 30 days
+                    if (i % 30 === 0) {
+                        const monthSeparator = document.createElement('div');
+                        monthSeparator.className = 'gantt-month-separator';
+                        
+                        const monthLabel = document.createElement('div');
+                        monthLabel.className = 'gantt-month-label';
+                        monthLabel.textContent = `Month${monthCounter}`;
+                        monthCounter++;
+                        
+                        weekElement.appendChild(monthSeparator);
+                        weekElement.appendChild(monthLabel);
+                    }
+                    
+                    headerTimeline.appendChild(weekElement);
+                    weekCounter++;
+                }
+                headerRow.appendChild(headerTimeline);
+                ganttChart.appendChild(headerRow);
+                
+                // Generate sections and tasks
+                sections.forEach(section => {
+                    // Add section header
+                    const sectionHeader = document.createElement('div');
+                    sectionHeader.className = 'gantt-section';
+                    sectionHeader.setAttribute('data-name', section.name);
+                    ganttChart.appendChild(sectionHeader);
+                    
+                    // Add tasks
+                    section.tasks.forEach(task => {
+                        const taskRow = document.createElement('div');
+                        taskRow.className = 'gantt-row';
+                        
+                        const taskLabel = document.createElement('div');
+                        taskLabel.className = 'gantt-label';
+                        taskLabel.textContent = task.name;
+                        taskRow.appendChild(taskLabel);
+                        
+                        const taskTimeline = document.createElement('div');
+                        taskTimeline.className = 'gantt-timeline';
+                        
+                        // Calculate task position
+                        const taskStartDate = new Date(task.start);
+                        const daysFromStart = daysBetween(startDate, taskStartDate);
+                        const leftPosition = daysFromStart * dayWidth;
+                        const width = task.duration * dayWidth;
+                        
+                        // Create task bar
+                        const taskBarWrapper = document.createElement('div');
+                        taskBarWrapper.className = 'gantt-bar-wrapper';
+                        taskBarWrapper.style.left = `${leftPosition}px`;
+                        
+                        if (task.milestone) {
+                            // Milestone
+                            taskBarWrapper.style.width = '20px';
+                            const taskBar = document.createElement('div');
+                            taskBar.className = 'gantt-bar-milestone';
+                            taskBarWrapper.appendChild(taskBar);
+                        } else {
+                            // Regular task
+                            taskBarWrapper.style.width = `${width}px`;
+                            const taskBar = document.createElement('div');
+                            taskBar.className = `gantt-bar gantt-bar-${kebabCase(section.name)}`;
+                            
+                            // Add label to bars with sufficient width
+                            if (width > 50) {
+                                const taskBarLabel = document.createElement('div');
+                                taskBarLabel.className = 'gantt-bar-label';
+                                taskBarLabel.textContent = task.id;
+                                taskBar.appendChild(taskBarLabel);
+                            }
+                            
+                            taskBarWrapper.appendChild(taskBar);
+                        }
+                        
+                        // Add task data attributes for tooltip
+                        taskBarWrapper.dataset.id = task.id;
+                        taskBarWrapper.dataset.name = task.name;
+                        taskBarWrapper.dataset.start = task.start;
+                        taskBarWrapper.dataset.end = task.duration > 0 ? 
+                            formatDate(addDays(taskStartDate, task.duration - 1)) : task.start;
+                        taskBarWrapper.dataset.duration = task.duration.toString();
+                        
+                        // Add hover effect
+                        taskBarWrapper.addEventListener('mouseenter', showTaskInfo);
+                        taskBarWrapper.addEventListener('mouseleave', hideTaskInfo);
+                        
+                        taskTimeline.appendChild(taskBarWrapper);
+                        taskRow.appendChild(taskTimeline);
+                        ganttChart.appendChild(taskRow);
+                    });
+                });
+            }
+            
+            // Convert string to kebab-case
+            function kebabCase(str) {
+                return str.toLowerCase().replace(/\s+/g, '-');
+            }
+            
+            // Show task info tooltip
+            function showTaskInfo(e) {
+                const taskInfo = document.getElementById('task-info');
+                const taskData = e.currentTarget.dataset;
+                
+                document.getElementById('task-title').textContent = taskData.name;
+                document.getElementById('task-start').textContent = taskData.start;
+                document.getElementById('task-end').textContent = taskData.end;
+                document.getElementById('task-duration').textContent = taskData.duration;
+                
+                // Position tooltip
+                const rect = e.currentTarget.getBoundingClientRect();
+                taskInfo.style.left = `${rect.right + 10}px`;
+                taskInfo.style.top = `${rect.top}px`;
+                taskInfo.style.display = 'block';
+                
+                // Adjust if tooltip goes outside viewport
+                const tooltipRect = taskInfo.getBoundingClientRect();
+                if (tooltipRect.right > window.innerWidth) {
+                    taskInfo.style.left = `${rect.left - tooltipRect.width - 10}px`;
+                }
+            }
+            
+            // Hide task info tooltip
+            function hideTaskInfo() {
+                document.getElementById('task-info').style.display = 'none';
+            }
+            
+            // Initialize zoom controls
+            document.getElementById('zoom-in').addEventListener('click', function() {
+                if (dayWidth < maxDayWidth) {
+                    dayWidth += 5;
+                    generateGanttChart();
+                }
+            });
+            
+            document.getElementById('zoom-out').addEventListener('click', function() {
+                if (dayWidth > minDayWidth) {
+                    dayWidth -= 5;
+                    generateGanttChart();
+                }
+            });
+            
+            document.getElementById('reset').addEventListener('click', function() {
+                dayWidth = 20;
+                generateGanttChart();
+            });
+            
+            // Initial chart generation
+            generateGanttChart();
+        });
+    </script>
+</body>
+</html>
