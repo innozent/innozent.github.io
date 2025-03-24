@@ -3,654 +3,853 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Learning Quiz</title>
+    <title>Machine Learning Quiz</title>
     <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbb;
+            --correct: #4caf50;
+            --incorrect: #f44336;
+            --neutral: #f0f2f5;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .quiz-container {
             background-color: white;
-            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
         }
-        .question {
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
             margin-bottom: 20px;
-            padding: 15px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f5f5f5;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .section {
             display: none;
         }
-        .question.active {
+        
+        .section.active {
             display: block;
         }
-        .options {
-            margin-top: 10px;
+        
+        .question-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--neutral);
+            border-radius: 8px;
         }
+        
+        .question {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        
         .option {
-            padding: 10px;
-            margin: 5px 0;
+            padding: 10px 15px;
+            background-color: white;
             border: 1px solid #ddd;
             border-radius: 5px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
         }
+        
         .option:hover {
             background-color: #f0f0f0;
         }
+        
         .option.selected {
-            background-color: #e3f2fd;
-            border-color: #2196f3;
+            background-color: var(--secondary);
+            color: white;
         }
+        
         .option.correct {
-            background-color: #c8e6c9;
-            border-color: #4caf50;
+            background-color: var(--correct);
+            color: white;
         }
+        
         .option.incorrect {
-            background-color: #ffcdd2;
-            border-color: #f44336;
+            background-color: var(--incorrect);
+            color: white;
         }
-        .navigation {
-            margin-top: 20px;
+        
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 5px 5px 0;
+            display: none;
+        }
+        
+        .explanation h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .buttons {
             display: flex;
             justify-content: space-between;
+            margin-top: 20px;
         }
+        
         button {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            background-color: #2196f3;
+            background-color: var(--primary);
             color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
+            font-size: 16px;
         }
+        
         button:hover {
-            background-color: #1976d2;
+            background-color: var(--secondary);
         }
+        
         button:disabled {
-            background-color: #bdbdbd;
+            background-color: #cccccc;
             cursor: not-allowed;
         }
-        .progress {
-            margin-bottom: 20px;
-            text-align: center;
+        
+        .check-btn {
+            background-color: #28a745;
         }
+        
+        .check-btn:hover {
+            background-color: #218838;
+        }
+        
+        .show-btn {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .show-btn:hover {
+            background-color: #e0a800;
+        }
+        
+        .results {
+            text-align: center;
+            display: none;
+        }
+        
         .score {
-            text-align: center;
-            font-size: 1.2em;
-            margin-top: 20px;
-        }
-        .feedback {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
+            font-size: 24px;
             font-weight: bold;
-        }
-        .correct-feedback {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #a5d6a7;
-        }
-        .incorrect-feedback {
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
-        }
-        .explanation {
-            margin-top: 10px;
-            font-weight: normal;
-            font-size: 0.9em;
-            line-height: 1.4;
+            margin: 20px 0;
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
-    <div class="quiz-container">
-        <h1>Deep Learning Quiz</h1>
-        <div class="progress">Question <span id="current-question">1</span> of <span id="total-questions">0</span></div>
-        <div id="questions"></div>
-        <div class="navigation">
-            <button id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
-            <button id="next-btn" onclick="nextQuestion()">Next</button>
-            <button id="submit-btn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
+    <div class="container">
+        <h1>Machine Learning Quiz</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('mc')">Multiple Choice</div>
+            <div class="tab" onclick="showTab('fb')">Fill Blanks</div>
+            <div class="tab" onclick="showTab('sa')">Short Answer</div>
         </div>
-        <div class="score" id="score"></div>
+        
+        <!-- Multiple Choice Section -->
+        <div id="mc" class="section active">
+            <div class="question-container">
+                <div class="question">1. What is the final step after training and validating a machine learning model?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 0, 0)">Model deployment</li>
+                    <li class="option" onclick="selectOption(this, 0, 1)">Reminding the problem statement</li>
+                    <li class="option" onclick="selectOption(this, 0, 2)">Data preprocessing</li>
+                    <li class="option" onclick="selectOption(this, 0, 3)">Feature extraction</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>The machine learning lifecycle typically follows these steps: problem definition, data collection, data preprocessing, feature extraction, model selection, model training, model validation, and finally model deployment. After you've trained and validated your model, the natural final step is to deploy it so it can be used in real-world applications.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="checkAnswer(0, 0)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 0, 1)" id="mc-next-0">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">2. Which metric is specifically used for machine translation evaluation?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 1, 0)">Word Error Rate</li>
+                    <li class="option" onclick="selectOption(this, 1, 1)">BLEU Score</li>
+                    <li class="option" onclick="selectOption(this, 1, 2)">Precision</li>
+                    <li class="option" onclick="selectOption(this, 1, 3)">Accuracy</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>BLEU (Bilingual Evaluation Understudy) Score is specifically designed for evaluating machine translation quality. It measures the similarity between machine-generated translations and reference translations by counting matching n-grams. The other options are general metrics not specifically designed for translation tasks.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 1, 0)">Previous Question</button>
+                    <button onclick="checkAnswer(1, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 1, 2)" id="mc-next-1">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">3. Which method does not relate to data augmentation for noisy text?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 2, 0)">Back Translation</li>
+                    <li class="option" onclick="selectOption(this, 2, 1)">Synonym Replacement</li>
+                    <li class="option" onclick="selectOption(this, 2, 2)">Word Embedding</li>
+                    <li class="option" onclick="selectOption(this, 2, 3)">Sentence Shuffling</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>Word Embedding is a technique for representing words as vectors in a continuous space, not a data augmentation technique. Back Translation (translating text to another language and back), Synonym Replacement, and Sentence Shuffling are all valid text augmentation techniques used to create variations of text data.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 2, 1)">Previous Question</button>
+                    <button onclick="checkAnswer(2, 2)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 2, 3)" id="mc-next-2">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">4. In the context of evaluation, what does ROC-AUC represent?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 3, 0)">Data transformation method</li>
+                    <li class="option" onclick="selectOption(this, 3, 1)">True and false positive rate thresholding</li>
+                    <li class="option" onclick="selectOption(this, 3, 2)">Neural network layer</li>
+                    <li class="option" onclick="selectOption(this, 3, 3)">Sentence embedding model</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>ROC (Receiver Operating Characteristic) curve plots the True Positive Rate against the False Positive Rate at various classification thresholds. The Area Under this Curve (AUC) measures the model's ability to distinguish between classes across all possible thresholds. It's not a transformation method, neural network layer, or embedding model.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 3, 2)">Previous Question</button>
+                    <button onclick="checkAnswer(3, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 3, 4)" id="mc-next-3">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">5. What is SMOTE used for in imbalanced data handling?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 4, 0)">Data normalization</li>
+                    <li class="option" onclick="selectOption(this, 4, 1)">Generating synthetic samples for minority classes</li>
+                    <li class="option" onclick="selectOption(this, 4, 2)">Model accuracy evaluation</li>
+                    <li class="option" onclick="selectOption(this, 4, 3)">Creating classification models</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>SMOTE (Synthetic Minority Over-sampling Technique) creates synthetic examples for minority classes by interpolating between existing minority samples. This helps address class imbalance by increasing the representation of minority classes without simply duplicating existing samples.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 4, 3)">Previous Question</button>
+                    <button onclick="checkAnswer(4, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 4, 5)" id="mc-next-4">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">6. Which technique is used for handling imbalanced data?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 5, 0)">Outlier Detection</li>
+                    <li class="option" onclick="selectOption(this, 5, 1)">Under sampling</li>
+                    <li class="option" onclick="selectOption(this, 5, 2)">Cross-validation</li>
+                    <li class="option" onclick="selectOption(this, 5, 3)">Data Fusion</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>Under sampling is a technique specifically designed to handle imbalanced data by reducing the number of samples from the majority class to balance it with the minority class. Outlier detection, cross-validation, and data fusion serve different purposes and aren't primarily for handling imbalanced datasets.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 5, 4)">Previous Question</button>
+                    <button onclick="checkAnswer(5, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 5, 6)" id="mc-next-5">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">7. What does k-fold cross-validation aim to achieve?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 6, 0)">High data redundancy</li>
+                    <li class="option" onclick="selectOption(this, 6, 1)">Reuse of all data for both training and testing</li>
+                    <li class="option" onclick="selectOption(this, 6, 2)">Elimination of validation</li>
+                    <li class="option" onclick="selectOption(this, 6, 3)">Onetime testing</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>K-fold cross-validation divides the dataset into k subsets (folds), then trains and validates the model k times, each time using a different fold as the validation set and the remaining folds as the training set. This allows all data to be used for both training and testing, making efficient use of limited data while reducing the risk of overfitting.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 6, 5)">Previous Question</button>
+                    <button onclick="checkAnswer(6, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 6, 7)" id="mc-next-6">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">8. What does the F1 Score measure?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 7, 0)">Data relevance</li>
+                    <li class="option" onclick="selectOption(this, 7, 1)">Harmonic mean of precision and recall</li>
+                    <li class="option" onclick="selectOption(this, 7, 2)">Linear regression</li>
+                    <li class="option" onclick="selectOption(this, 7, 3)">Sum of precision and recall</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>The F1 Score is calculated as the harmonic mean of precision and recall: 2 × (precision × recall) / (precision + recall). It provides a balanced measure that takes both false positives and false negatives into account, making it useful for imbalanced classification problems.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 7, 6)">Previous Question</button>
+                    <button onclick="checkAnswer(7, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 7, 8)" id="mc-next-7">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">9. What is the initial step in K-means clustering?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 8, 0)">Selecting centroids randomly</li>
+                    <li class="option" onclick="selectOption(this, 8, 1)">Selecting centroids from the datapoints</li>
+                    <li class="option" onclick="selectOption(this, 8, 2)">Determining the optimal number of clusters</li>
+                    <li class="option" onclick="selectOption(this, 8, 3)">Calculating distances between points</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>The standard K-means algorithm begins by randomly selecting K points as initial centroids (not necessarily from the datapoints). It then iteratively assigns points to the nearest centroid and updates the centroid positions until convergence. Determining the optimal number of clusters is typically done before running K-means.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 8, 7)">Previous Question</button>
+                    <button onclick="checkAnswer(8, 0)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 8, 9)" id="mc-next-8">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">10. Which of the following statements is true about K-means?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 9, 0)">It always converges to a global minimum</li>
+                    <li class="option" onclick="selectOption(this, 9, 1)">It converges to a local minimum</li>
+                    <li class="option" onclick="selectOption(this, 9, 2)">It does not converge</li>
+                    <li class="option" onclick="selectOption(this, 9, 3)">It uses supervised learning</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>K-means is guaranteed to converge, but it typically converges to a local minimum of the objective function (sum of squared distances), not necessarily the global minimum. This is why K-means is often run multiple times with different initializations to find better solutions.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 9, 8)">Previous Question</button>
+                    <button onclick="checkAnswer(9, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextTab('fb')">Go to Fill in the Blanks</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fill in the Blanks Section -->
+        <div id="fb" class="section">
+            <div class="question-container">
+                <div class="question">1. Dropout and L1/L2 are ________ techniques used to prevent overfitting to noise.</div>
+                <input type="text" id="fb-answer-0" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>regularization</p>
+                    <h3>Explanation:</h3>
+                    <p>Regularization techniques like Dropout (randomly disabling neurons during training) and L1/L2 regularization (penalizing large weights) help prevent models from becoming too complex and overfitting to training data noise.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="checkFillBlank(0, 'regularization')" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('fb', 0, 1)" id="fb-next-0">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">2. ________ measures the overall correctness of a model's predictions in classification problem.</div>
+                <input type="text" id="fb-answer-1" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>accuracy</p>
+                    <h3>Explanation:</h3>
+                    <p>Accuracy is the ratio of correct predictions to total predictions, providing a straightforward measure of overall prediction correctness. However, it can be misleading for imbalanced datasets.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('fb', 1, 0)">Previous Question</button>
+                    <button onclick="checkFillBlank(1, 'accuracy')" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('fb', 1, 2)" id="fb-next-1">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">3. Name two hyperparameter tuning approaches.</div>
+                <input type="text" id="fb-answer-2" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>grid search, random search, bayesian optimization, genetic algorithms, gradient-based optimization</p>
+                    <h3>Explanation:</h3>
+                    <p>Grid Search systematically evaluates all combinations of predefined hyperparameter values, while Random Search samples random combinations, often more efficiently. These are common approaches for finding optimal hyperparameter configurations. Other valid approaches include Bayesian Optimization, Genetic Algorithms, and Gradient-based Optimization.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('fb', 2, 1)">Previous Question</button>
+                    <button onclick="checkFillBlank(2, ['grid search', 'random search', 'bayesian optimization', 'genetic algorithms', 'gradient-based optimization'])" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('fb', 2, 3)" id="fb-next-2">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">4. In supervised learning, models are trained using a ________ dataset.</div>
+                <input type="text" id="fb-answer-3" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>labeled</p>
+                    <h3>Explanation:</h3>
+                    <p>Supervised learning requires labeled data where the target outputs or answers are provided during training. The model learns to map inputs to these known outputs, unlike unsupervised learning where no labels are provided.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('fb', 3, 2)">Previous Question</button>
+                    <button onclick="checkFillBlank(3, 'labeled')" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('fb', 3, 4)" id="fb-next-3">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">5. K-means is sensitive to the initial choice of ________, which can affect its convergence.</div>
+                <input type="text" id="fb-answer-4" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>centroids</p>
+                    <h3>Explanation:</h3>
+                    <p>The initial placement of centroids can significantly impact K-means' final clustering solution because the algorithm converges to local minima. Different initial centroids can lead to different final clusters.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('fb', 4, 3)">Previous Question</button>
+                    <button onclick="checkFillBlank(4, 'centroids')" class="check-btn">Check Answer</button>
+                    <button onclick="nextTab('sa')">Go to Short Answers</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Short Answer Section -->
+        <div id="sa" class="section">
+            <div class="question-container">
+                <div class="question">1. Mention three performance metrics for regression and three performance metrics for classification.</div>
+                <textarea id="sa-answer-0" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p><strong>Regression metrics:</strong><br>
+                    - Mean Squared Error (MSE)<br>
+                    - Root Mean Squared Error (RMSE)<br>
+                    - Mean Absolute Error (MAE)<br>
+                    - R-squared (Coefficient of Determination)<br>
+                    - Mean Absolute Percentage Error (MAPE)</p>
+                    
+                    <p><strong>Classification metrics:</strong><br>
+                    - Accuracy<br>
+                    - Precision<br>
+                    - Recall (Sensitivity)<br>
+                    - F1 Score<br>
+                    - Area Under ROC Curve (AUC-ROC)<br>
+                    - Specificity<br>
+                    - Matthews Correlation Coefficient (MCC)</p>
+                    
+                    <h3>Explanation:</h3>
+                    <p>Regression metrics measure the distance between predicted and actual continuous values, while classification metrics evaluate the correctness of categorical predictions. The choice of metric depends on the specific problem requirements and data characteristics.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="showExplanation('sa', 0)" class="show-btn">Show Answer</button>
+                    <button onclick="nextQuestion('sa', 0, 1)" id="sa-next-0">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">2. What is the difference between kmeans and kmeans++? What is the benefit of using kmeans++ instead of kmeans?</div>
+                <textarea id="sa-answer-1" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p>K-means uses random initialization of centroids, while K-means++ uses a strategic initialization method that selects initial centroids that are far apart from each other. The benefit of K-means++ is that it tends to find better clusters more consistently and converges faster since it starts with a better initialization, reducing the chance of poor local optima.</p>
+                    
+                    <h3>Explanation:</h3>
+                    <p>The initialization strategy in K-means++ provides a more effective starting point that often leads to more optimal clustering solutions with fewer iterations required for convergence compared to standard K-means.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('sa', 1, 0)">Previous Question</button>
+                    <button onclick="showExplanation('sa', 1)" class="show-btn">Show Answer</button>
+                    <button onclick="nextQuestion('sa', 1, 2)" id="sa-next-1">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">3. Why is clustering preferred over classification for analyzing web data?</div>
+                <textarea id="sa-answer-2" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p>Clustering is preferred for web data analysis because:</p>
+                    <ol>
+                        <li>Web data is often unlabeled, making supervised classification difficult</li>
+                        <li>Clustering can discover unknown patterns and groupings in diverse web content</li>
+                        <li>It can adapt to the dynamic and evolving nature of web data without requiring retraining</li>
+                        <li>It helps in organizing vast amounts of heterogeneous web information into meaningful groups</li>
+                        <li>It's useful for exploratory analysis when the categories aren't predefined</li>
+                    </ol>
+                    
+                    <h3>Explanation:</h3>
+                    <p>The web generates massive amounts of unstructured and unlabeled data continuously. Clustering provides a flexible approach to discover patterns without requiring labeled training data, making it well-suited for web analytics, content organization, and user behavior analysis.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('sa', 2, 1)">Previous Question</button>
+                    <button onclick="showExplanation('sa', 2)" class="show-btn">Show Answer</button>
+                    <button onclick="nextQuestion('sa', 2, 3)" id="sa-next-2">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">4. Why is naive bayes a popular model in classification, and most of the time we use it as a baseline?</div>
+                <textarea id="sa-answer-3" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p>Naive Bayes is popular and often used as a baseline because:</p>
+                    <ol>
+                        <li>It's computationally efficient and scales well with large datasets</li>
+                        <li>It requires minimal data preparation and hyper-parameter tuning</li>
+                        <li>It performs surprisingly well despite its "naive" independence assumption</li>
+                        <li>It works well with high-dimensional data like text classification</li>
+                        <li>It's relatively simple to implement and interpret</li>
+                        <li>It can handle missing values and is less prone to overfitting</li>
+                    </ol>
+                    
+                    <h3>Explanation:</h3>
+                    <p>The simplicity, efficiency, and reasonable performance of Naive Bayes make it an excellent starting point before investing in more complex models. Its performance can also serve as a benchmark to determine if more sophisticated approaches are justified for a given problem.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('sa', 3, 2)">Previous Question</button>
+                    <button onclick="showExplanation('sa', 3)" class="show-btn">Show Answer</button>
+                    <button onclick="nextQuestion('sa', 3, 4)" id="sa-next-3">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">5. Explain why K-means might converge to a local minimum instead of a global minimum.</div>
+                <textarea id="sa-answer-4" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p>K-means converges to a local minimum rather than a global minimum because:</p>
+                    <ol>
+                        <li>The algorithm uses an iterative optimization approach that makes locally optimal choices at each step</li>
+                        <li>The initial random placement of centroids strongly influences the final solution</li>
+                        <li>The objective function (sum of squared distances) has multiple local minima in the solution space</li>
+                        <li>K-means lacks a mechanism to escape from poor local minima once it starts converging</li>
+                        <li>The convergence process only guarantees improvement in each iteration, not finding the best possible solution</li>
+                    </ol>
+                    
+                    <h3>Explanation:</h3>
+                    <p>The optimization landscape for K-means contains many possible solutions (local minima), and the algorithm has no way to "jump" between these solutions to find the global optimum. Instead, it follows a deterministic path from its starting position to the nearest local minimum.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('sa', 4, 3)">Previous Question</button>
+                    <button onclick="showExplanation('sa', 4)" class="show-btn">Show Answer</button>
+                    <button onclick="nextQuestion('sa', 4, 5)" id="sa-next-4">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">6. What are some methods for handling imbalanced textual data in NLP?</div>
+                <textarea id="sa-answer-5" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p>Methods for handling imbalanced textual data in NLP include:</p>
+                    
+                    <p><strong>1. Resampling techniques:</strong></p>
+                    <ul>
+                        <li>Oversampling minority classes (e.g., randomly duplicating samples)</li>
+                        <li>Undersampling majority classes</li>
+                        <li>SMOTE or other synthetic data generation for text</li>
+                    </ul>
+                    
+                    <p><strong>2. Class weighting:</strong></p>
+                    <ul>
+                        <li>Assigning higher weights to minority classes during model training</li>
+                    </ul>
+                    
+                    <p><strong>3. Data augmentation:</strong></p>
+                    <ul>
+                        <li>Synonym replacement</li>
+                        <li>Back-translation</li>
+                        <li>Text generation using language models</li>
+                        <li>EDA (Easy Data Augmentation)</li>
+                    </ul>
+                    
+                    <p><strong>4. Algorithmic approaches:</strong></p>
+                    <ul>
+                        <li>Ensemble methods like balanced random forests</li>
+                        <li>Cost-sensitive learning</li>
+                        <li>Anomaly/novelty detection for extremely imbalanced cases</li>
+                    </ul>
+                    
+                    <p><strong>5. Evaluation adjustments:</strong></p>
+                    <ul>
+                        <li>Using appropriate metrics like F1-score, precision-recall curves</li>
+                        <li>Stratified sampling for validation</li>
+                    </ul>
+                    
+                    <h3>Explanation:</h3>
+                    <p>Text data presents unique challenges for addressing class imbalance due to its high dimensionality and semantic complexity. These methods help create more balanced representations or adjust the learning process to pay more attention to underrepresented classes, resulting in models that better capture patterns in minority classes.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('sa', 5, 4)">Previous Question</button>
+                    <button onclick="showExplanation('sa', 5)" class="show-btn">Show Answer</button>
+                    <button onclick="showResults()">Finish Quiz</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="results" class="results">
+            <h2>Quiz Completed!</h2>
+            <p>You've completed the Machine Learning quiz. Great job!</p>
+            <p>Review the questions to see detailed explanations for each answer.</p>
+            <button onclick="restartQuiz()">Restart Quiz</button>
+        </div>
     </div>
 
     <script>
-        const questions = [
-            {
-                question: "What is the main difference between supervised and unsupervised learning?",
-                options: [
-                    "Supervised learning uses labeled data, while unsupervised learning uses unlabeled data",
-                    "Supervised learning is faster than unsupervised learning",
-                    "Unsupervised learning always gives better results",
-                    "There is no difference between them"
-                ],
-                correct: 0,
-                explanation: "Supervised learning requires labeled data where each training example has a known output, while unsupervised learning works with unlabeled data to find patterns and structures."
-            },
-            {
-                question: "What is the primary purpose of an autoencoder?",
-                options: [
-                    "To reduce dimensionality and learn efficient data representations",
-                    "To generate random numbers",
-                    "To perform regression",
-                    "To classify images"
-                ],
-                correct: 0,
-                explanation: "Autoencoders are neural networks designed to learn efficient data representations by compressing input data into a lower-dimensional latent space and then reconstructing it."
-            },
-            {
-                question: "Which of the following is NOT a type of autoencoder?",
-                options: [
-                    "Vanilla Autoencoder",
-                    "Regression Autoencoder",
-                    "Multi-layer Autoencoder",
-                    "Convolutional Autoencoder"
-                ],
-                correct: 1,
-                explanation: "Regression Autoencoder is not a standard type of autoencoder. The common types include Vanilla, Multi-layer, Convolutional, and Variational Autoencoders."
-            },
-            {
-                question: "What is the role of the encoder in an autoencoder?",
-                options: [
-                    "To perform regression",
-                    "To classify the input data",
-                    "To generate new data",
-                    "To compress input data into a latent space"
-                ],
-                correct: 3,
-                explanation: "The encoder's primary function is to compress the input data into a lower-dimensional representation called the latent space. This compression helps in learning efficient features and reducing dimensionality."
-            },
-            {
-                question: "Which activation function is typically used in the output layer of a regression model?",
-                options: [
-                    "Linear (no activation)",
-                    "Sigmoid",
-                    "ReLU",
-                    "Tanh"
-                ],
-                correct: 0,
-                explanation: "For regression tasks, a linear activation function (or no activation) is typically used in the output layer because we want to predict continuous values without any constraints on the range."
-            },
-            {
-                question: "What is the main application of autoencoders in image processing?",
-                options: [
-                    "Object detection",
-                    "Image classification",
-                    "Image segmentation",
-                    "Image denoising and dimensionality reduction"
-                ],
-                correct: 3,
-                explanation: "Autoencoders are particularly effective in image denoising and dimensionality reduction because they can learn to reconstruct clean images from noisy inputs and compress high-dimensional image data into a lower-dimensional representation."
-            },
-            {
-                question: "Which loss function is commonly used for binary classification tasks?",
-                options: [
-                    "Mean Squared Error",
-                    "Huber Loss",
-                    "Categorical Cross-Entropy",
-                    "Binary Cross-Entropy"
-                ],
-                correct: 3,
-                explanation: "Binary Cross-Entropy is the standard loss function for binary classification because it's specifically designed for two-class problems and provides better gradient properties than other loss functions for this task."
-            },
-            {
-                question: "What is the purpose of the decoder in an autoencoder?",
-                options: [
-                    "To compress the input data",
-                    "To perform feature extraction",
-                    "To classify the input data",
-                    "To reconstruct the input from the latent representation"
-                ],
-                correct: 3,
-                explanation: "The decoder's role is to reconstruct the input data from the compressed latent representation. It works in conjunction with the encoder to learn how to effectively compress and decompress the data."
-            },
-            {
-                question: "Which of the following is an application of unsupervised learning?",
-                options: [
-                    "Price prediction",
-                    "Customer segmentation",
-                    "Image classification",
-                    "Spam detection"
-                ],
-                correct: 1,
-                explanation: "Customer segmentation is a classic example of unsupervised learning where we group customers based on their behavior patterns without predefined labels, unlike the other options which are supervised learning tasks."
-            },
-            {
-                question: "What is the main advantage of using a multi-layer autoencoder over a vanilla autoencoder?",
-                options: [
-                    "It's easier to implement",
-                    "It uses less memory",
-                    "It's faster to train",
-                    "It can learn more complex features"
-                ],
-                correct: 3,
-                explanation: "Multi-layer autoencoders can learn more complex features because they have multiple layers of non-linear transformations, allowing them to capture hierarchical patterns in the data that a single-layer autoencoder cannot."
-            },
-            {
-                question: "In a regularized autoencoder, what is the purpose of randomly setting input nodes to zero?",
-                options: [
-                    "To speed up training",
-                    "To make the model simpler",
-                    "To reduce memory usage",
-                    "To prevent overfitting and improve generalization"
-                ],
-                correct: 3,
-                explanation: "Randomly setting input nodes to zero (dropout) in a regularized autoencoder helps prevent overfitting by forcing the network to learn robust features that don't rely on any single input node."
-            },
-            {
-                question: "What is the key characteristic of a Convolutional Autoencoder?",
-                options: [
-                    "It can only work with text data",
-                    "It's faster than other autoencoders",
-                    "It uses only fully connected layers",
-                    "It uses convolutional layers for both encoding and decoding"
-                ],
-                correct: 3,
-                explanation: "Convolutional Autoencoders use convolutional layers for both encoding and decoding, which makes them particularly effective for processing image data by preserving spatial relationships in the data."
-            },
-            {
-                question: "Which of the following is NOT a common application of autoencoders?",
-                options: [
-                    "Image classification",
-                    "Dimensionality reduction",
-                    "Anomaly detection",
-                    "Data denoising"
-                ],
-                correct: 0,
-                explanation: "While autoencoders can be used for feature extraction in classification tasks, direct image classification is not their primary application. They are more commonly used for dimensionality reduction, anomaly detection, and data denoising."
-            },
-            {
-                question: "What is the main difference between a vanilla autoencoder and a variational autoencoder (VAE)?",
-                options: [
-                    "VAE is faster to train",
-                    "VAE is simpler to implement",
-                    "VAE can only work with images",
-                    "VAE learns a probabilistic distribution in the latent space"
-                ],
-                correct: 3,
-                explanation: "The key difference is that VAEs learn a probabilistic distribution in the latent space, allowing them to generate new samples by sampling from this distribution, unlike vanilla autoencoders which learn a deterministic mapping."
-            },
-            {
-                question: "In the context of autoencoders, what is the 'latent space'?",
-                options: [
-                    "The input layer",
-                    "The output layer",
-                    "The training data",
-                    "The compressed representation of the input data"
-                ],
-                correct: 3,
-                explanation: "The latent space is the compressed representation of the input data learned by the encoder. It contains the essential features of the input data in a lower-dimensional form."
-            },
-            {
-                question: "What is the purpose of using the MNIST dataset in autoencoder examples?",
-                options: [
-                    "It's the only dataset that works with autoencoders",
-                    "It's the most complex dataset available",
-                    "It's faster to train on",
-                    "It's a simple dataset that demonstrates dimensionality reduction well"
-                ],
-                correct: 3,
-                explanation: "MNIST is commonly used in autoencoder examples because it's a simple, well-structured dataset that clearly demonstrates the dimensionality reduction capabilities of autoencoders, making it ideal for educational purposes."
-            },
-            {
-                question: "Which of the following is a key component of a multilayer perceptron?",
-                options: [
-                    "Only output layer",
-                    "Only hidden layers",
-                    "Only input and output layers",
-                    "Input layer, hidden layers, and output layer"
-                ],
-                correct: 3,
-                explanation: "A multilayer perceptron consists of three main components: an input layer that receives the data, one or more hidden layers that process the information, and an output layer that produces the final prediction."
-            },
-            {
-                question: "What is the role of activation functions in neural networks?",
-                options: [
-                    "To make the network faster",
-                    "To reduce memory usage",
-                    "To make the network simpler",
-                    "To introduce non-linearity into the network"
-                ],
-                correct: 3,
-                explanation: "Activation functions introduce non-linearity into the network, allowing it to learn complex patterns and relationships in the data that linear transformations alone cannot capture."
-            },
-            {
-                question: "Which of the following is NOT a common activation function?",
-                options: [
-                    "ReLU",
-                    "Sigmoid",
-                    "Linear",
-                    "Random"
-                ],
-                correct: 3,
-                explanation: "Random is not a valid activation function. Common activation functions include ReLU, Sigmoid, Tanh, and Linear, each with specific properties suitable for different types of neural networks."
-            },
-            {
-                question: "What is the purpose of the validation split in training?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To evaluate model performance on unseen data"
-                ],
-                correct: 3,
-                explanation: "The validation split is used to evaluate the model's performance on unseen data during training, helping to detect overfitting and determine when to stop training."
-            },
-            {
-                question: "What is the main purpose of using TensorBoard in deep learning?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To visualize training metrics and model architecture"
-                ],
-                correct: 3,
-                explanation: "TensorBoard is a visualization tool that helps developers monitor and visualize various aspects of deep learning models, including training metrics, model architecture, and parameter distributions."
-            },
-            {
-                question: "Which of the following is a common hyperparameter in neural networks?",
-                options: [
-                    "The color of the output",
-                    "The font size of the code",
-                    "The computer's screen resolution",
-                    "The learning rate"
-                ],
-                correct: 3,
-                explanation: "The learning rate is a crucial hyperparameter that controls how quickly the model learns from the training data. It's one of the most important parameters to tune in neural networks."
-            },
-            {
-                question: "What is the purpose of early stopping in training?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To prevent overfitting"
-                ],
-                correct: 3,
-                explanation: "Early stopping is a regularization technique that prevents overfitting by stopping the training process when the model's performance on the validation set starts to degrade."
-            },
-            {
-                question: "What is the main difference between the Sequential and Functional API in Keras?",
-                options: [
-                    "The Sequential API is faster",
-                    "The Sequential API uses less memory",
-                    "The Functional API is simpler to use",
-                    "The Functional API allows for more complex model architectures"
-                ],
-                correct: 3,
-                explanation: "The Functional API allows for more complex model architectures with multiple inputs/outputs, shared layers, and branching paths, while the Sequential API is limited to linear stacks of layers."
-            },
-            {
-                question: "What is the purpose of the StandardScaler in data preprocessing?",
-                options: [
-                    "To make the data more colorful",
-                    "To reduce memory usage",
-                    "To make the data simpler",
-                    "To standardize features to have mean=0 and variance=1"
-                ],
-                correct: 3,
-                explanation: "StandardScaler normalizes the features to have a mean of 0 and a standard deviation of 1, which helps in training neural networks by ensuring all features are on the same scale."
-            },
-            {
-                question: "What is the main purpose of using dropout in neural networks?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To prevent overfitting"
-                ],
-                correct: 3,
-                explanation: "Dropout is a regularization technique that randomly deactivates neurons during training to prevent overfitting by making the network more robust and less dependent on any single neuron."
-            },
-            {
-                question: "What is the purpose of the batch size parameter?",
-                options: [
-                    "To determine the size of the output",
-                    "To determine the size of the input",
-                    "To control the learning rate",
-                    "To control how many samples are processed before updating the model"
-                ],
-                correct: 3,
-                explanation: "The batch size determines how many samples are processed before updating the model's weights. It affects both training speed and model generalization."
-            },
-            {
-                question: "What is the main advantage of using the Adam optimizer?",
-                options: [
-                    "It's the fastest optimizer",
-                    "It uses the least memory",
-                    "It's the simplest to implement",
-                    "It adapts the learning rate for each parameter"
-                ],
-                correct: 3,
-                explanation: "Adam optimizer combines the benefits of RMSprop and momentum by adapting the learning rate for each parameter individually, making it effective for most deep learning tasks."
-            },
-            {
-                question: "What is the purpose of the train_test_split function?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the data simpler",
-                    "To split data into training and testing sets"
-                ],
-                correct: 3,
-                explanation: "train_test_split is used to divide the dataset into training and testing sets, which is crucial for evaluating the model's performance on unseen data."
-            },
-            {
-                question: "What is the main purpose of using the Sequential model in Keras?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To create simple, linear stack of layers"
-                ],
-                correct: 3,
-                explanation: "The Sequential model in Keras is designed for creating simple neural networks with a linear stack of layers, making it ideal for straightforward architectures."
-            },
-            {
-                question: "What is the purpose of the Dense layer in neural networks?",
-                options: [
-                    "To make the network faster",
-                    "To reduce memory usage",
-                    "To make the network simpler",
-                    "To perform linear transformations and apply activation functions"
-                ],
-                correct: 3,
-                explanation: "Dense layers perform linear transformations on the input data and apply activation functions, making them fundamental building blocks of neural networks."
-            },
-            {
-                question: "What is the main purpose of using the compile method in Keras?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To configure the learning process"
-                ],
-                correct: 3,
-                explanation: "The compile method configures the learning process by specifying the optimizer, loss function, and metrics to be used during training."
-            },
-            {
-                question: "What is the purpose of the fit method in Keras?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To train the model for a fixed number of epochs"
-                ],
-                correct: 3,
-                explanation: "The fit method is used to train the model for a specified number of epochs, handling the training loop and validation process."
-            },
-            {
-                question: "What is the main purpose of using the predict method?",
-                options: [
-                    "To make predictions faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To generate predictions for input samples"
-                ],
-                correct: 3,
-                explanation: "The predict method is used to generate predictions for new input samples using the trained model."
-            },
-            {
-                question: "What is the purpose of the summary method in Keras?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To display the model architecture"
-                ],
-                correct: 3,
-                explanation: "The summary method displays a detailed overview of the model's architecture, including layer types, shapes, and parameter counts."
-            },
-            {
-                question: "What is the main purpose of using the reshape operation?",
-                options: [
-                    "To make data more colorful",
-                    "To reduce memory usage",
-                    "To make the data simpler",
-                    "To change the shape of arrays without changing their data"
-                ],
-                correct: 3,
-                explanation: "The reshape operation changes the shape of arrays while preserving their data, which is essential for preparing data in the correct format for different types of neural network layers."
-            },
-            {
-                question: "What is the purpose of the astype method in data preprocessing?",
-                options: [
-                    "To make data more colorful",
-                    "To reduce memory usage",
-                    "To make the data simpler",
-                    "To cast arrays to a specified type"
-                ],
-                correct: 3,
-                explanation: "The astype method is used to convert arrays to a specified data type, which is important for ensuring data compatibility with different operations and neural network requirements."
-            },
-            {
-                question: "What is the main purpose of using the validation_data parameter in model.fit?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To evaluate the model on validation data during training"
-                ],
-                correct: 3,
-                explanation: "The validation_data parameter allows you to evaluate the model's performance on a separate validation set during training, helping to monitor for overfitting."
-            },
-            {
-                question: "What is the purpose of the shuffle parameter in model.fit?",
-                options: [
-                    "To make training faster",
-                    "To reduce memory usage",
-                    "To make the model simpler",
-                    "To shuffle the training data before each epoch"
-                ],
-                correct: 3,
-                explanation: "The shuffle parameter determines whether to shuffle the training data before each epoch, which helps prevent the model from learning order-dependent patterns in the data."
-            }
-        ];
-
-        let currentQuestion = 0;
-        let userAnswers = new Array(questions.length).fill(null);
-        let quizSubmitted = false;
-        let shuffledOptions = new Array(questions.length).fill(null);
-        let showFeedback = false;
-
-        // Fisher-Yates shuffle algorithm
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+        // Variables to track selected answers
+        let selectedOptions = {};
+        let scores = {
+            mc: Array(10).fill(0),
+            fb: Array(5).fill(0)
+        };
+        
+        // Show a specific tab
+        function showTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Update tab styles
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(tabId).classList.add('active');
+            
+            // Find and activate the tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabId.toLowerCase())) {
+                    tab.classList.add('active');
+                }
+            });
         }
-
-        function displayQuestion(index) {
-            const questionsDiv = document.getElementById('questions');
-            questionsDiv.innerHTML = '';
-            
-            document.getElementById('total-questions').textContent = questions.length;
-            
-            questions.forEach((q, i) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = `question ${i === index ? 'active' : ''}`;
+        
+        // Navigate to the next tab
+        function nextTab(tabId) {
+            showTab(tabId);
+        }
+        
+        // Select an option for multiple choice
+        function selectOption(element, questionIndex, optionIndex) {
+            // Only allow selection if not already checked
+            if (!element.classList.contains('correct') && !element.classList.contains('incorrect')) {
+                // Remove selected class from all options in this question
+                const options = element.parentElement.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.classList.remove('selected');
+                });
                 
-                if (!shuffledOptions[i]) {
-                    shuffledOptions[i] = shuffleArray([...q.options]);
+                // Add selected class to clicked option
+                element.classList.add('selected');
+                
+                // Store the selected option
+                selectedOptions[`mc-${questionIndex}`] = optionIndex;
+            }
+        }
+        
+        // Check multiple choice answer
+        function checkAnswer(questionIndex, correctIndex) {
+            const selectedIndex = selectedOptions[`mc-${questionIndex}`];
+            const options = document.querySelectorAll(`#mc .question-container:nth-child(${questionIndex+1}) .option`);
+            
+            if (selectedIndex !== undefined) {
+                options.forEach((option, index) => {
+                    if (index === correctIndex) {
+                        option.classList.add('correct');
+                    } else if (index === selectedIndex) {
+                        option.classList.add('incorrect');
+                    }
+                });
+                
+                // Show explanation
+                document.querySelectorAll(`#mc .question-container:nth-child(${questionIndex+1}) .explanation`)[0].style.display = 'block';
+                
+                // Update score
+                scores.mc[questionIndex] = (selectedIndex === correctIndex) ? 1 : 0;
+            } else {
+                alert('Please select an answer first!');
+            }
+        }
+        
+        // Check fill in the blank answer
+        function checkFillBlank(questionIndex, correctAnswer) {
+            const userAnswer = document.getElementById(`fb-answer-${questionIndex}`).value.trim().toLowerCase();
+            const inputElement = document.getElementById(`fb-answer-${questionIndex}`);
+            
+            if (userAnswer) {
+                let isCorrect = false;
+                
+                if (Array.isArray(correctAnswer)) {
+                    // Check if any of the correct answers are included in the user's answer
+                    isCorrect = correctAnswer.some(ans => 
+                        userAnswer.includes(ans.toLowerCase())
+                    );
+                } else {
+                    isCorrect = userAnswer === correctAnswer.toLowerCase();
                 }
                 
-                const isCorrect = userAnswers[i] !== null && 
-                    shuffledOptions[i][userAnswers[i]] === q.options[q.correct];
+                // Apply styling based on correctness
+                if (isCorrect) {
+                    inputElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    inputElement.style.borderColor = 'var(--correct)';
+                } else {
+                    inputElement.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                    inputElement.style.borderColor = 'var(--incorrect)';
+                }
                 
-                questionDiv.innerHTML = `
-                    <h3>${q.question}</h3>
-                    <div class="options">
-                        ${shuffledOptions[i].map((option, j) => `
-                            <div class="option ${userAnswers[i] === j ? 'selected' : ''} 
-                                         ${userAnswers[i] !== null ? (j === shuffledOptions[i].indexOf(q.options[q.correct]) ? 'correct' : userAnswers[i] === j ? 'incorrect' : '') : ''}"
-                                 onclick="selectOption(${i}, ${j})">
-                                ${option}
-                            </div>
-                        `).join('')}
-                    </div>
-                    ${userAnswers[i] !== null ? `
-                        <div class="feedback ${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">
-                            ${isCorrect ? '✓ Correct!' : '✗ Incorrect'}
-                            <div class="explanation">${q.explanation}</div>
-                        </div>
-                    ` : ''}
-                `;
+                // Show explanation
+                document.querySelectorAll(`#fb .question-container:nth-child(${questionIndex+1}) .explanation`)[0].style.display = 'block';
                 
-                questionsDiv.appendChild(questionDiv);
+                // Update score
+                scores.fb[questionIndex] = isCorrect ? 1 : 0;
+            } else {
+                alert('Please enter an answer first!');
+            }
+        }
+        
+        // Navigate to next/previous question
+        function nextQuestion(sectionId, currentIndex, nextIndex) {
+            // Hide current question
+            document.querySelectorAll(`#${sectionId} .question-container`)[currentIndex].style.display = 'none';
+            
+            // Show next question
+            document.querySelectorAll(`#${sectionId} .question-container`)[nextIndex].style.display = 'block';
+        }
+        
+        function prevQuestion(sectionId, currentIndex, prevIndex) {
+            // Hide current question
+            document.querySelectorAll(`#${sectionId} .question-container`)[currentIndex].style.display = 'none';
+            
+            // Show previous question
+            document.querySelectorAll(`#${sectionId} .question-container`)[prevIndex].style.display = 'block';
+        }
+        
+        // Show explanation for short answer questions
+        function showExplanation(sectionId, questionIndex) {
+            document.querySelectorAll(`#${sectionId} .question-container:nth-child(${questionIndex+1}) .explanation`)[0].style.display = 'block';
+        }
+        
+        // Show results
+        function showResults() {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
             });
-
-            document.getElementById('current-question').textContent = index + 1;
-            document.getElementById('prev-btn').disabled = index === 0;
-            document.getElementById('next-btn').style.display = index === questions.length - 1 ? 'none' : 'block';
-            document.getElementById('submit-btn').style.display = index === questions.length - 1 ? 'block' : 'none';
-        }
-
-        function selectOption(questionIndex, optionIndex) {
-            if (userAnswers[questionIndex] !== null) return; // Prevent changing answer after selection
-            userAnswers[questionIndex] = optionIndex;
-            displayQuestion(currentQuestion);
-        }
-
-        function prevQuestion() {
-            if (currentQuestion > 0) {
-                currentQuestion--;
-                displayQuestion(currentQuestion);
-            }
-        }
-
-        function nextQuestion() {
-            if (currentQuestion < questions.length - 1) {
-                currentQuestion++;
-                displayQuestion(currentQuestion);
-            }
-        }
-
-        function submitQuiz() {
-            quizSubmitted = true;
-            const score = userAnswers.filter((answer, index) => 
-                shuffledOptions[index][answer] === questions[index].options[questions[index].correct]
-            ).length;
-            const percentage = (score / questions.length) * 100;
             
-            document.getElementById('score').innerHTML = `
-                <h2>Quiz Complete!</h2>
-                <p>Your score: ${score} out of ${questions.length} (${percentage.toFixed(1)}%)</p>
-            `;
-            
-            displayQuestion(currentQuestion);
+            // Show results
+            document.getElementById('results').style.display = 'block';
         }
-
-        // Initialize the quiz
-        displayQuestion(0);
+        
+        // Restart quiz
+        function restartQuiz() {
+            // Reset selections and scores
+            selectedOptions = {};
+            scores = {
+                mc: Array(5).fill(0),
+                fb: Array(3).fill(0)
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.value = '';
+                input.style.backgroundColor = '';
+                input.style.borderColor = '';
+            });
+            
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.value = '';
+            });
+            
+            document.querySelectorAll('.explanation').forEach(exp => {
+                exp.style.display = 'none';
+            });
+            
+            // Show first question in each section
+            document.querySelectorAll('.question-container').forEach((container, index) => {
+                container.style.display = index === 0 ? 'block' : 'none';
+            });
+            
+            // Show multiple choice tab
+            showTab('mc');
+            
+            // Hide results
+            document.getElementById('results').style.display = 'none';
+        }
     </script>
 </body>
-</html> 
+</html>
