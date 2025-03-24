@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning Quiz</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbb;
+            --correct: #4caf50;
+            --incorrect: #f44336;
+            --neutral: #f0f2f5;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .question-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--neutral);
+            border-radius: 8px;
+        }
+        
+        .question {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .option {
+            padding: 10px 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .option.selected {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .option.correct {
+            background-color: var(--correct);
+            color: white;
+        }
+        
+        .option.incorrect {
+            background-color: var(--incorrect);
+            color: white;
+        }
+        
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 5px 5px 0;
+            display: none;
+        }
+        
+        .explanation h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .check-btn {
+            background-color: #28a745;
+        }
+        
+        .check-btn:hover {
+            background-color: #218838;
+        }
+        
+        .show-btn {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .show-btn:hover {
+            background-color: #e0a800;
+        }
+        
+        .results {
+            text-align: center;
+            display: none;
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Machine Learning Quiz</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('mc')">Multiple Choice</div>
+            <div class="tab" onclick="showTab('fb')">Fill Blanks</div>
+            <div class="tab" onclick="showTab('sa')">Short Answer</div>
+        </div>
+        
+        <!-- Multiple Choice Section -->
+        <div id="mc" class="section active">
+            <div class="question-container">
+                <div class="question">1. What is the final step after training and validating a machine learning model?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 0, 0)">Model deployment</li>
+                    <li class="option" onclick="selectOption(this, 0, 1)">Reminding the problem statement</li>
+                    <li class="option" onclick="selectOption(this, 0, 2)">Data preprocessing</li>
+                    <li class="option" onclick="selectOption(this, 0, 3)">Feature extraction</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>The machine learning lifecycle typically follows these steps: problem definition, data collection, data preprocessing, feature extraction, model selection, model training, model validation, and finally model deployment. After you've trained and validated your model, the natural final step is to deploy it so it can be used in real-world applications.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="checkAnswer(0, 0)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 0, 1)" id="mc-next-0">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">2. Which metric is specifically used for machine translation evaluation?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 1, 0)">Word Error Rate</li>
+                    <li class="option" onclick="selectOption(this, 1, 1)">BLEU Score</li>
+                    <li class="option" onclick="selectOption(this, 1, 2)">Precision</li>
+                    <li class="option" onclick="selectOption(this, 1, 3)">Accuracy</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>BLEU (Bilingual Evaluation Understudy) Score is specifically designed for evaluating machine translation quality. It measures the similarity between machine-generated translations and reference translations by counting matching n-grams. The other options are general metrics not specifically designed for translation tasks.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 1, 0)">Previous Question</button>
+                    <button onclick="checkAnswer(1, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 1, 2)" id="mc-next-1">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">3. Which method does not relate to data augmentation for noisy text?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 2, 0)">Back Translation</li>
+                    <li class="option" onclick="selectOption(this, 2, 1)">Synonym Replacement</li>
+                    <li class="option" onclick="selectOption(this, 2, 2)">Word Embedding</li>
+                    <li class="option" onclick="selectOption(this, 2, 3)">Sentence Shuffling</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>Word Embedding is a technique for representing words as vectors in a continuous space, not a data augmentation technique. Back Translation (translating text to another language and back), Synonym Replacement, and Sentence Shuffling are all valid text augmentation techniques used to create variations of text data.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 2, 1)">Previous Question</button>
+                    <button onclick="checkAnswer(2, 2)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 2, 3)" id="mc-next-2">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">4. In the context of evaluation, what does ROC-AUC represent?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 3, 0)">Data transformation method</li>
+                    <li class="option" onclick="selectOption(this, 3, 1)">True and false positive rate thresholding</li>
+                    <li class="option" onclick="selectOption(this, 3, 2)">Neural network layer</li>
+                    <li class="option" onclick="selectOption(this, 3, 3)">Sentence embedding model</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>ROC (Receiver Operating Characteristic) curve plots the True Positive Rate against the False Positive Rate at various classification thresholds. The Area Under this Curve (AUC) measures the model's ability to distinguish between classes across all possible thresholds. It's not a transformation method, neural network layer, or embedding model.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 3, 2)">Previous Question</button>
+                    <button onclick="checkAnswer(3, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('mc', 3, 4)" id="mc-next-3">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">5. What is SMOTE used for in imbalanced data handling?</div>
+                <ul class="options">
+                    <li class="option" onclick="selectOption(this, 4, 0)">Data normalization</li>
+                    <li class="option" onclick="selectOption(this, 4, 1)">Generating synthetic samples for minority classes</li>
+                    <li class="option" onclick="selectOption(this, 4, 2)">Model accuracy evaluation</li>
+                    <li class="option" onclick="selectOption(this, 4, 3)">Creating classification models</li>
+                </ul>
+                <div class="explanation">
+                    <h3>Explanation:</h3>
+                    <p>SMOTE (Synthetic Minority Over-sampling Technique) creates synthetic examples for minority classes by interpolating between existing minority samples. This helps address class imbalance by increasing the representation of minority classes without simply duplicating existing samples.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('mc', 4, 3)">Previous Question</button>
+                    <button onclick="checkAnswer(4, 1)" class="check-btn">Check Answer</button>
+                    <button onclick="nextTab('fb')">Go to Fill in the Blanks</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fill in the Blanks Section -->
+        <div id="fb" class="section">
+            <div class="question-container">
+                <div class="question">1. Dropout and L1/L2 are ________ techniques used to prevent overfitting to noise.</div>
+                <input type="text" id="fb-answer-0" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>regularization</p>
+                    <h3>Explanation:</h3>
+                    <p>Regularization techniques like Dropout (randomly disabling neurons during training) and L1/L2 regularization (penalizing large weights) help prevent models from becoming too complex and overfitting to training data noise.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="checkFillBlank(0, 'regularization')" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('fb', 0, 1)" id="fb-next-0">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">2. ________ measures the overall correctness of a model's predictions in classification problem.</div>
+                <input type="text" id="fb-answer-1" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>accuracy</p>
+                    <h3>Explanation:</h3>
+                    <p>Accuracy is the ratio of correct predictions to total predictions, providing a straightforward measure of overall prediction correctness. However, it can be misleading for imbalanced datasets.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('fb', 1, 0)">Previous Question</button>
+                    <button onclick="checkFillBlank(1, 'accuracy')" class="check-btn">Check Answer</button>
+                    <button onclick="nextQuestion('fb', 1, 2)" id="fb-next-1">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">3. Name two hyperparameter tuning approaches.</div>
+                <input type="text" id="fb-answer-2" placeholder="Type your answer...">
+                <div class="explanation">
+                    <h3>Correct Answer:</h3>
+                    <p>grid search, random search, bayesian optimization, genetic algorithms, gradient-based optimization</p>
+                    <h3>Explanation:</h3>
+                    <p>Grid Search systematically evaluates all combinations of predefined hyperparameter values, while Random Search samples random combinations, often more efficiently. These are common approaches for finding optimal hyperparameter configurations. Other valid approaches include Bayesian Optimization, Genetic Algorithms, and Gradient-based Optimization.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('fb', 2, 1)">Previous Question</button>
+                    <button onclick="checkFillBlank(2, ['grid search', 'random search', 'bayesian optimization', 'genetic algorithms', 'gradient-based optimization'])" class="check-btn">Check Answer</button>
+                    <button onclick="nextTab('sa')">Go to Short Answers</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Short Answer Section -->
+        <div id="sa" class="section">
+            <div class="question-container">
+                <div class="question">1. Mention three performance metrics for regression and three performance metrics for classification.</div>
+                <textarea id="sa-answer-0" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p><strong>Regression metrics:</strong><br>
+                    - Mean Squared Error (MSE)<br>
+                    - Root Mean Squared Error (RMSE)<br>
+                    - Mean Absolute Error (MAE)<br>
+                    - R-squared (Coefficient of Determination)<br>
+                    - Mean Absolute Percentage Error (MAPE)</p>
+                    
+                    <p><strong>Classification metrics:</strong><br>
+                    - Accuracy<br>
+                    - Precision<br>
+                    - Recall (Sensitivity)<br>
+                    - F1 Score<br>
+                    - Area Under ROC Curve (AUC-ROC)<br>
+                    - Specificity<br>
+                    - Matthews Correlation Coefficient (MCC)</p>
+                    
+                    <h3>Explanation:</h3>
+                    <p>Regression metrics measure the distance between predicted and actual continuous values, while classification metrics evaluate the correctness of categorical predictions. The choice of metric depends on the specific problem requirements and data characteristics.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="showExplanation('sa', 0)" class="show-btn">Show Answer</button>
+                    <button onclick="nextQuestion('sa', 0, 1)" id="sa-next-0">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">2. What is the difference between kmeans and kmeans++? What is the benefit of using kmeans++ instead of kmeans?</div>
+                <textarea id="sa-answer-1" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p>K-means uses random initialization of centroids, while K-means++ uses a strategic initialization method that selects initial centroids that are far apart from each other. The benefit of K-means++ is that it tends to find better clusters more consistently and converges faster since it starts with a better initialization, reducing the chance of poor local optima.</p>
+                    
+                    <h3>Explanation:</h3>
+                    <p>The initialization strategy in K-means++ provides a more effective starting point that often leads to more optimal clustering solutions with fewer iterations required for convergence compared to standard K-means.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('sa', 1, 0)">Previous Question</button>
+                    <button onclick="showExplanation('sa', 1)" class="show-btn">Show Answer</button>
+                    <button onclick="nextQuestion('sa', 1, 2)" id="sa-next-1">Next Question</button>
+                </div>
+            </div>
+            
+            <div class="question-container" style="display: none;">
+                <div class="question">3. Why is clustering preferred over classification for analyzing web data?</div>
+                <textarea id="sa-answer-2" placeholder="Type your answer here..."></textarea>
+                <div class="explanation">
+                    <h3>Model Answer:</h3>
+                    <p>Clustering is preferred for web data analysis because:</p>
+                    <ol>
+                        <li>Web data is often unlabeled, making supervised classification difficult</li>
+                        <li>Clustering can discover unknown patterns and groupings in diverse web content</li>
+                        <li>It can adapt to the dynamic and evolving nature of web data without requiring retraining</li>
+                        <li>It helps in organizing vast amounts of heterogeneous web information into meaningful groups</li>
+                        <li>It's useful for exploratory analysis when the categories aren't predefined</li>
+                    </ol>
+                    
+                    <h3>Explanation:</h3>
+                    <p>The web generates massive amounts of unstructured and unlabeled data continuously. Clustering provides a flexible approach to discover patterns without requiring labeled training data, making it well-suited for web analytics, content organization, and user behavior analysis.</p>
+                </div>
+                <div class="buttons">
+                    <button onclick="prevQuestion('sa', 2, 1)">Previous Question</button>
+                    <button onclick="showExplanation('sa', 2)" class="show-btn">Show Answer</button>
+                    <button onclick="showResults()">Finish Quiz</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="results" class="results">
+            <h2>Quiz Completed!</h2>
+            <p>You've completed the Machine Learning quiz. Great job!</p>
+            <p>Review the questions to see detailed explanations for each answer.</p>
+            <button onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables to track selected answers
+        let selectedOptions = {};
+        let scores = {
+            mc: Array(5).fill(0),
+            fb: Array(3).fill(0)
+        };
+        
+        // Show a specific tab
+        function showTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Update tab styles
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(tabId).classList.add('active');
+            
+            // Find and activate the tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabId.toLowerCase())) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+        
+        // Navigate to the next tab
+        function nextTab(tabId) {
+            showTab(tabId);
+        }
+        
+        // Select an option for multiple choice
+        function selectOption(element, questionIndex, optionIndex) {
+            // Only allow selection if not already checked
+            if (!element.classList.contains('correct') && !element.classList.contains('incorrect')) {
+                // Remove selected class from all options in this question
+                const options = element.parentElement.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked option
+                element.classList.add('selected');
+                
+                // Store the selected option
+                selectedOptions[`mc-${questionIndex}`] = optionIndex;
+            }
+        }
+        
+        // Check multiple choice answer
+        function checkAnswer(questionIndex, correctIndex) {
+            const selectedIndex = selectedOptions[`mc-${questionIndex}`];
+            const options = document.querySelectorAll(`#mc .question-container:nth-child(${questionIndex+1}) .option`);
+            
+            if (selectedIndex !== undefined) {
+                options.forEach((option, index) => {
+                    if (index === correctIndex) {
+                        option.classList.add('correct');
+                    } else if (index === selectedIndex) {
+                        option.classList.add('incorrect');
+                    }
+                });
+                
+                // Show explanation
+                document.querySelectorAll(`#mc .question-container:nth-child(${questionIndex+1}) .explanation`)[0].style.display = 'block';
+                
+                // Update score
+                scores.mc[questionIndex] = (selectedIndex === correctIndex) ? 1 : 0;
+            } else {
+                alert('Please select an answer first!');
+            }
+        }
+        
+        // Check fill in the blank answer
+        function checkFillBlank(questionIndex, correctAnswer) {
+            const userAnswer = document.getElementById(`fb-answer-${questionIndex}`).value.trim().toLowerCase();
+            const inputElement = document.getElementById(`fb-answer-${questionIndex}`);
+            
+            if (userAnswer) {
+                let isCorrect = false;
+                
+                if (Array.isArray(correctAnswer)) {
+                    // Check if any of the correct answers are included in the user's answer
+                    isCorrect = correctAnswer.some(ans => 
+                        userAnswer.includes(ans.toLowerCase())
+                    );
+                } else {
+                    isCorrect = userAnswer === correctAnswer.toLowerCase();
+                }
+                
+                // Apply styling based on correctness
+                if (isCorrect) {
+                    inputElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    inputElement.style.borderColor = 'var(--correct)';
+                } else {
+                    inputElement.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                    inputElement.style.borderColor = 'var(--incorrect)';
+                }
+                
+                // Show explanation
+                document.querySelectorAll(`#fb .question-container:nth-child(${questionIndex+1}) .explanation`)[0].style.display = 'block';
+                
+                // Update score
+                scores.fb[questionIndex] = isCorrect ? 1 : 0;
+            } else {
+                alert('Please enter an answer first!');
+            }
+        }
+        
+        // Navigate to next/previous question
+        function nextQuestion(sectionId, currentIndex, nextIndex) {
+            // Hide current question
+            document.querySelectorAll(`#${sectionId} .question-container`)[currentIndex].style.display = 'none';
+            
+            // Show next question
+            document.querySelectorAll(`#${sectionId} .question-container`)[nextIndex].style.display = 'block';
+        }
+        
+        function prevQuestion(sectionId, currentIndex, prevIndex) {
+            // Hide current question
+            document.querySelectorAll(`#${sectionId} .question-container`)[currentIndex].style.display = 'none';
+            
+            // Show previous question
+            document.querySelectorAll(`#${sectionId} .question-container`)[prevIndex].style.display = 'block';
+        }
+        
+        // Show explanation for short answer questions
+        function showExplanation(sectionId, questionIndex) {
+            document.querySelectorAll(`#${sectionId} .question-container:nth-child(${questionIndex+1}) .explanation`)[0].style.display = 'block';
+        }
+        
+        // Show results
+        function showResults() {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        // Restart quiz
+        function restartQuiz() {
+            // Reset selections and scores
+            selectedOptions = {};
+            scores = {
+                mc: Array(5).fill(0),
+                fb: Array(3).fill(0)
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.value = '';
+                input.style.backgroundColor = '';
+                input.style.borderColor = '';
+            });
+            
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.value = '';
+            });
+            
+            document.querySelectorAll('.explanation').forEach(exp => {
+                exp.style.display = 'none';
+            });
+            
+            // Show first question in each section
+            document.querySelectorAll('.question-container').forEach((container, index) => {
+                container.style.display = index === 0 ? 'block' : 'none';
+            });
+            
+            // Show multiple choice tab
+            showTab('mc');
+            
+            // Hide results
+            document.getElementById('results').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
