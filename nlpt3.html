@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLP Machine Learning Study Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        .quiz-container {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .question {
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .options label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .correct {
+            color: #27ae60;
+        }
+        
+        .incorrect {
+            color: #e74c3c;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .flashcard {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .flashcard-content {
+            display: none;
+        }
+        
+        .flashcard.flipped .flashcard-question {
+            display: none;
+        }
+        
+        .flashcard.flipped .flashcard-content {
+            display: block;
+        }
+        
+        .steps {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 10px 20px;
+            margin: 15px 0;
+        }
+        
+        .steps ol {
+            padding-left: 20px;
+        }
+        
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        
+        .example {
+            background-color: #e9f7ef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            color: #e83e8c;
+        }
+        
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 16px;
+            transition: 0.3s;
+            color: #333;
+        }
+        
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        
+        .tab button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .tabcontent {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            animation: fadeEffect 1s;
+        }
+        
+        @keyframes fadeEffect {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        
+        #quiz-progress {
+            margin-bottom: 20px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #3498db;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            line-height: 20px;
+        }
+        
+        #quiz-score {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .toggle-content {
+            display: none;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        
+        summary {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        
+        summary:hover {
+            background-color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <h1>NLP Machine Learning Study Guide</h1>
+    
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Supervised')" id="defaultOpen">Supervised Learning</button>
+        <button class="tablinks" onclick="openTab(event, 'Unsupervised')">Unsupervised Learning</button>
+        <button class="tablinks" onclick="openTab(event, 'Evaluation')">Evaluation Metrics</button>
+        <button class="tablinks" onclick="openTab(event, 'Quiz')">Practice Quiz</button>
+        <button class="tablinks" onclick="openTab(event, 'Flashcards')">Flashcards</button>
+    </div>
+    
+    <div id="Supervised" class="tabcontent">
+        <h2>Supervised Learning in NLP</h2>
+        
+        <div class="section">
+            <h3>Definition and Key Concepts</h3>
+            <p>Supervised learning is a machine learning approach where models are trained on <strong>labeled data</strong>. The key characteristic is the presence of known outputs (labels) for the input data during training. The objective is to learn a mapping from inputs to outputs, enabling predictions for unseen data.</p>
+            
+            <div class="note">
+                <strong>Key Point:</strong> In supervised learning, the model learns from examples that contain both input features and the correct output.
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Types of Supervised Learning in NLP</h3>
+            
+            <h4>Classification</h4>
+            <ul>
+                <li><strong>Definition:</strong> Predicts categorical responses from input data</li>
+                <li><strong>Applications:</strong> Spam detection, sentiment analysis, topic labeling</li>
+                <li><strong>Techniques:</strong> Decision trees, SVM, Naive Bayes, Neural Networks</li>
+                <li><strong>Examples:</strong> Classifying emails as spam/not spam, categorizing news articles by topic</li>
+            </ul>
+            
+            <h4>Regression</h4>
+            <ul>
+                <li><strong>Definition:</strong> Predicts continuous outcomes from input data</li>
+                <li><strong>Applications:</strong> Text scoring, relevance ranking in search results, readability assessments</li>
+                <li><strong>Techniques:</strong> Linear regression, Ridge regression, LASSO</li>
+                <li><strong>Examples:</strong> Predicting the reading level of a text, estimating the relevance score of a document</li>
+            </ul>
+            
+            <div class="note">
+                <strong>Remember:</strong> Classification predicts discrete categories while regression predicts continuous values.
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Common Supervised Learning Algorithms for NLP</h3>
+            
+            <h4>Naive Bayes</h4>
+            <p>A probabilistic classifier based on applying Bayes' theorem. It's particularly popular for text classification tasks due to its simplicity and effectiveness, especially with high-dimensional data.</p>
+            <div class="example">
+                <strong>Why it's popular as a baseline:</strong>
+                <ul>
+                    <li>Simple implementation</li>
+                    <li>Fast training and prediction</li>
+                    <li>Works well with high-dimensional data (like text)</li>
+                    <li>Performs surprisingly well even with the "naive" independence assumption</li>
+                    <li>Requires less training data than many other classifiers</li>
+                </ul>
+            </div>
+            
+            <h4>Support Vector Machines (SVM)</h4>
+            <p>SVM finds a hyperplane that best separates classes in the feature space. It's effective for text classification because it handles high-dimensional spaces well and is less prone to overfitting.</p>
+            
+            <h4>Logistic Regression</h4>
+            <p>Despite its name, logistic regression is a classification algorithm. It models the probability of a binary outcome as a function of input features and is widely used for NLP tasks like sentiment analysis.</p>
+            
+            <h4>Decision Trees & Random Forests</h4>
+            <p>Decision trees split data based on feature values to create a tree-like model. Random Forests combine multiple decision trees to improve performance and reduce overfitting.</p>
+            
+            <h4>Neural Networks</h4>
+            <p>Various neural network architectures are used for NLP tasks, including feed-forward networks, CNNs (Convolutional Neural Networks), and RNNs (Recurrent Neural Networks).</p>
+        </div>
+        
+        <div class="section">
+            <h3>Supervised Text Classification Process</h3>
+            
+            <div class="steps">
+                <ol>
+                    <li><strong>Data Collection and Labeling:</strong> Gather text data with corresponding labels (e.g., sentiments, categories, etc.)</li>
+                    <li><strong>Preprocessing:</strong>
+                        <ul>
+                            <li>Cleaning (removing special characters, HTML tags)</li>
+                            <li>Tokenization (breaking text into words or tokens)</li>
+                            <li>Normalization (converting to lowercase)</li>
+                            <li>Stopword removal (removing common words like "the", "and")</li>
+                            <li>Stemming/Lemmatization (reducing words to their root form)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Feature Extraction:</strong>
+                        <ul>
+                            <li>Bag of Words (BoW): Simple count of word occurrences</li>
+                            <li>TF-IDF (Term Frequency-Inverse Document Frequency): Weighs words based on frequency in document and corpus</li>
+                            <li>Word Embeddings: Dense vector representations of words (Word2Vec, GloVe)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Model Training:</strong> Select appropriate algorithm and train on labeled data</li>
+                    <li><strong>Model Evaluation:</strong> Assess performance using metrics like accuracy, precision, recall, F1-score</li>
+                    <li><strong>Hyperparameter Tuning:</strong> Optimize model parameters for better performance</li>
+                    <li><strong>Deployment:</strong> Use the trained model for predictions on new data</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Real-world Applications</h3>
+            
+            <h4>Sentiment Analysis</h4>
+            <p>Used to determine the emotional tone behind text. Applications include analyzing customer reviews, social media monitoring, and brand perception analysis.</p>
+            
+            <h4>Intent Recognition</h4>
+            <p>Used in chatbots and virtual assistants to understand what users want to accomplish. For example, distinguishing between an information request, a booking request, or a complaint.</p>
+            
+            <h4>Document Classification</h4>
+            <p>Categorizing documents by topic, relevance, or other criteria. Used in content management systems, recommendation engines, and information retrieval.</p>
+            
+            <h4>Language Identification</h4>
+            <p>Detecting which language a text is written in. Used in multilingual applications, content filtering, and translation services.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Challenges and Limitations</h3>
+            <ul>
+                <li><strong>Data Quality and Quantity:</strong> Supervised learning requires large amounts of high-quality labeled data</li>
+                <li><strong>Class Imbalance:</strong> When some classes have many more examples than others</li>
+                <li><strong>Feature Engineering:</strong> Selecting the right features can be challenging</li>
+                <li><strong>Overfitting:</strong> Models might perform well on training data but poorly on new data</li>
+                <li><strong>Context and Ambiguity:</strong> Language is inherently ambiguous, and models might struggle with contextual understanding</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="Unsupervised" class="tabcontent">
+        <h2>Unsupervised Learning in NLP</h2>
+        
+        <div class="section">
+            <h3>Definition and Key Concepts</h3>
+            <p>Unsupervised learning involves learning patterns from <strong>unlabeled data</strong>. In NLP, this often means discovering structures within text without pre-assigned labels or categories.</p>
+            
+            <div class="note">
+                <strong>Key Point:</strong> Unsupervised learning does not require labeled data, making it useful when annotations are expensive or unavailable.
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Main Unsupervised Learning Techniques in NLP</h3>
+            
+            <h4>Text Clustering</h4>
+            <p>Grouping similar texts based on content without pre-labeled categories. Used for organizing large document collections, information retrieval, and structuring web data.</p>
+            
+            <h4>Topic Modeling</h4>
+            <p>Identifying abstract topics that occur in a collection of documents. Used for summarizing, understanding, and organizing large volumes of text data.</p>
+            
+            <h4>Dimensionality Reduction</h4>
+            <p>Reducing the number of features while preserving essential information. Helps with visualization and computational efficiency.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Unsupervised Learning Algorithms for NLP</h3>
+            
+            <h4>Clustering Algorithms</h4>
+            <ul>
+                <li><strong>K-means:</strong> Partitions texts into K distinct clusters by minimizing within-cluster variance</li>
+                <li><strong>K-means++:</strong> An improved version of K-means with better initialization of cluster centroids</li>
+                <li><strong>Hierarchical Clustering:</strong> Builds nested clusters by progressively merging or splitting existing groups</li>
+                <li><strong>DBSCAN:</strong> Density-based clustering that identifies 'core' and 'border' points</li>
+            </ul>
+            
+            <div class="example">
+                <strong>K-means vs. K-means++:</strong>
+                <p><strong>K-means</strong> randomly selects initial centroids, which can lead to poor clustering if these initial points are not well distributed.</p>
+                <p><strong>K-means++</strong> uses a smarter initialization strategy:</p>
+                <ol>
+                    <li>First centroid is chosen randomly from the data points</li>
+                    <li>Subsequent centroids are selected with probability proportional to their squared distance from the closest existing centroid</li>
+                </ol>
+                <p><strong>Benefits of K-means++:</strong></p>
+                <ul>
+                    <li>Better initial cluster centers</li>
+                    <li>Faster convergence</li>
+                    <li>More consistent results across different runs</li>
+                    <li>Often results in better final clustering</li>
+                </ul>
+            </div>
+            
+            <h4>Topic Modeling Algorithms</h4>
+            <ul>
+                <li><strong>Latent Dirichlet Allocation (LDA):</strong> Assumes documents are mixtures of topics and topics are mixtures of words</li>
+                <li><strong>Non-negative Matrix Factorization (NMF):</strong> Represents documents and terms in matrices for topic discovery</li>
+            </ul>
+            
+            <h4>Dimensionality Reduction Techniques</h4>
+            <ul>
+                <li><strong>Principal Component Analysis (PCA):</strong> Transforms data into a set of linearly uncorrelated components</li>
+                <li><strong>Singular Value Decomposition (SVD):</strong> Used in latent semantic analysis to reduce dimensions</li>
+                <li><strong>t-SNE:</strong> Visualizes high-dimensional data in 2D or 3D space while preserving local relationships</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>Unsupervised NLP Process</h3>
+            
+            <div class="steps">
+                <ol>
+                    <li><strong>Data Collection:</strong> Gather unlabeled text data from relevant sources</li>
+                    <li><strong>Preprocessing:</strong> Same as supervised learning (cleaning, tokenization, normalization, etc.)</li>
+                    <li><strong>Feature Extraction:</strong> Convert text to numerical form (TF-IDF, word embeddings, etc.)</li>
+                    <li><strong>Dimensionality Reduction:</strong> Apply techniques like PCA or t-SNE if needed</li>
+                    <li><strong>Algorithm Application:</strong> Apply clustering or topic modeling algorithms</li>
+                    <li><strong>Evaluation:</strong> Use internal measures like silhouette score or coherence score</li>
+                    <li><strong>Interpretation:</strong> Analyze clusters or topics to understand their meaning</li>
+                    <li><strong>Refinement:</strong> Adjust parameters and repeat the process if necessary</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Evaluating Unsupervised Learning Results</h3>
+            
+            <h4>Clustering Evaluation</h4>
+            <ul>
+                <li><strong>Silhouette Score:</strong> Measures how similar an object is to its own cluster compared to other clusters</li>
+                <li><strong>Davies-Bouldin Index:</strong> Ratio of within-cluster distances to between-cluster distances</li>
+                <li><strong>Elbow Method:</strong> Helps determine the optimal number of clusters</li>
+            </ul>
+            
+            <h4>Topic Model Evaluation</h4>
+            <ul>
+                <li><strong>Perplexity:</strong> Measure of how well a model predicts new data (lower is better)</li>
+                <li><strong>Coherence Score:</strong> Measures semantic similarity among high-scoring words in a topic (higher is better)</li>
+                <li><strong>Human Evaluation:</strong> Subject matter experts assess the interpretability and usefulness of topics</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>Real-world Applications</h3>
+            
+            <h4>Customer Service Automation</h4>
+            <p>Clustering customer inquiries to identify common issues and automate responses.</p>
+            
+            <h4>Content Recommendation</h4>
+            <p>Using topic modeling to understand user preferences and recommend relevant content.</p>
+            
+            <h4>Document Organization</h4>
+            <p>Clustering large document collections for better navigation and retrieval.</p>
+            
+            <h4>Trend Analysis</h4>
+            <p>Identifying emerging topics or themes in social media or news articles.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Challenges and Limitations</h3>
+            <ul>
+                <li><strong>Interpretability:</strong> Clusters or topics might not be easily interpretable</li>
+                <li><strong>Evaluation:</strong> Without labels, it's challenging to objectively evaluate results</li>
+                <li><strong>Parameter Selection:</strong> Choosing the right number of clusters or topics</li>
+                <li><strong>High Dimensionality:</strong> Text data often has high dimensions, making clustering difficult</li>
+                <li><strong>Ambiguity:</strong> Words may belong to multiple topics, and the same word can have different meanings in different contexts</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>Why Clustering is Preferred for Web Data Analysis</h3>
+            <p>Clustering is often preferred over classification for analyzing web data for several reasons:</p>
+            <ol>
+                <li><strong>No Labeled Data Required:</strong> Web data is vast and frequently changing, making manual labeling impractical</li>
+                <li><strong>Discovery of Hidden Patterns:</strong> Clustering can reveal natural groupings in the data that might not be known beforehand</li>
+                <li><strong>Scalability:</strong> Can handle large volumes of web data efficiently</li>
+                <li><strong>Adaptability:</strong> Can adjust to new or emerging categories without retraining</li>
+                <li><strong>Exploratory Analysis:</strong> Helps understand the structure of the data before applying more specific models</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div id="Evaluation" class="tabcontent">
+        <h2>Evaluation Metrics for ML in NLP</h2>
+        
+        <div class="section">
+            <h3>Classification Metrics</h3>
+            
+            <h4>Accuracy</h4>
+            <p>The ratio of correctly predicted observations to the total observations.</p>
+            <pre><code>Accuracy = (TP + TN) / (TP + TN + FP + FN)</code></pre>
+            <p>Where:</p>
+            <ul>
+                <li>TP = True Positives</li>
+                <li>TN = True Negatives</li>
+                <li>FP = False Positives</li>
+                <li>FN = False Negatives</li>
+            </ul>
+            
+            <h4>Precision</h4>
+            <p>The ratio of correctly predicted positive observations to the total predicted positives.</p>
+            <pre><code>Precision = TP / (TP + FP)</code></pre>
+            
+            <h4>Recall (Sensitivity)</h4>
+            <p>The ratio of correctly predicted positive observations to all actual positives.</p>
+            <pre><code>Recall = TP / (TP + FN)</code></pre>
+            
+            <h4>F1 Score</h4>
+            <p>The harmonic mean of Precision and Recall, providing a balance between the two.</p>
+            <pre><code>F1 Score = 2 * (Precision * Recall) / (Precision + Recall)</code></pre>
+            
+            <h4>ROC-AUC</h4>
+            <p>The Area Under the Receiver Operating Characteristic curve, representing the model's ability to discriminate between classes across various thresholds.</p>
+            
+            <div class="note">
+                <strong>Key Point:</strong> For imbalanced datasets, metrics like precision, recall, and F1 score are often more informative than accuracy.
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Regression Metrics</h3>
+            
+            <h4>Mean Squared Error (MSE)</h4>
+            <p>The average of squared differences between predicted and actual values.</p>
+            <pre><code>MSE = (1/n) * Σ(actual - predicted)²</code></pre>
+            
+            <h4>Root Mean Squared Error (RMSE)</h4>
+            <p>The square root of MSE, giving a measure in the same units as the target variable.</p>
+            <pre><code>RMSE = √MSE</code></pre>
+            
+            <h4>Mean Absolute Error (MAE)</h4>
+            <p>The average of absolute differences between predicted and actual values.</p>
+            <pre><code>MAE = (1/n) * Σ|actual - predicted|</code></pre>
+            
+            <h4>R-squared (R²)</h4>
+            <p>The proportion of variance in the dependent variable that can be predicted from the independent variables.</p>
+            <pre><code>R² = 1 - (SSres / SStot)</code></pre>
+            <p>Where:</p>
+            <ul>
+                <li>SSres = Sum of squares of residuals</li>
+                <li>SStot = Total sum of squares</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>Clustering Evaluation</h3>
+            
+            <h4>Silhouette Score</h4>
+            <p>Measures how similar an object is to its own cluster compared to other clusters. Values range from -1 to 1, with higher values indicating better clustering.</p>
+            
+            <h4>Davies-Bouldin Index</h4>
+            <p>The average similarity between each cluster and its most similar cluster. Lower values indicate better clustering.</p>
+            
+            <h4>Calinski-Harabasz Index</h4>
+            <p>Also known as the Variance Ratio Criterion. Higher values indicate better clustering.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Topic Model Evaluation</h3>
+            
+            <h4>Perplexity</h4>
+            <p>A measure of how well a probability model predicts a sample. Lower perplexity indicates better models.</p>
+            
+            <h4>Topic Coherence</h4>
+            <p>Measures the semantic similarity among high-scoring words in a topic. Higher coherence indicates more interpretable topics.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Cross-Validation</h3>
+            
+            <h4>K-Fold Cross-Validation</h4>
+            <p>Data is divided into k subsets (folds). The model is trained on k-1 folds and tested on the remaining fold. This process is repeated k times, with each fold used once as the test set.</p>
+            
+            <div class="example">
+                <strong>Benefits of k-fold cross-validation:</strong>
+                <ul>
+                    <li>Uses all data for both training and testing</li>
+                    <li>Provides a more reliable estimate of model performance</li>
+                    <li>Reduces the impact of data partitioning on results</li>
+                </ul>
+            </div>
+            
+            <h4>Stratified K-Fold</h4>
+            <p>A variation of k-fold that ensures each fold has the same proportion of classes as the original dataset. Useful for imbalanced datasets.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Handling Imbalanced Data</h3>
+            
+            <h4>Techniques</h4>
+            <ul>
+                <li><strong>Undersampling:</strong> Reducing the number of samples from the majority class</li>
+                <li><strong>Oversampling:</strong> Increasing the number of samples from the minority class</li>
+                <li><strong>SMOTE (Synthetic Minority Over-sampling Technique):</strong> Generating synthetic samples for minority classes</li>
+                <li><strong>Class Weights:</strong> Assigning different weights to classes during model training</li>
+            </ul>
+            
+            <h4>Evaluation for Imbalanced Data</h4>
+            <ul>
+                <li>Precision-Recall curves</li>
+                <li>F1 score (especially for minority classes)</li>
+                <li>Area Under the Precision-Recall Curve (AUPRC)</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>Comparison of Metrics</h3>
+            
+            <table class="comparison-table">
+                <tr>
+                    <th>Task</th>
+                    <th>Metric</th>
+                    <th>When to Use</th>
+                </tr>
+                <tr>
+                    <td rowspan="4">Classification</td>
+                    <td>Accuracy</td>
+                    <td>Balanced datasets, when all classes are equally important</td>
+                </tr>
+                <tr>
+                    <td>Precision</td>
+                    <td>When false positives are costly</td>
+                </tr>
+                <tr>
+                    <td>Recall</td>
+                    <td>When false negatives are costly</td>
+                </tr>
+                <tr>
+                    <td>F1 Score</td>
+                    <td>When balance between precision and recall is needed</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">Regression</td>
+                    <td>MSE/RMSE</td>
+                    <td>When larger errors should be penalized more</td>
+                </tr>
+                <tr>
+                    <td>MAE</td>
+                    <td>When outliers should not have disproportionate influence</td>
+                </tr>
+                <tr>
+                    <td>R²</td>
+                    <td>To understand the proportion of variance explained</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Clustering</td>
+                    <td>Silhouette Score</td>
+                    <td>To evaluate cluster separation and cohesion</td>
+                </tr>
+                <tr>
+                    <td>Davies-Bouldin Index</td>
+                    <td>To evaluate cluster similarity</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Topic Modeling</td>
+                    <td>Perplexity</td>
+                    <td>To evaluate statistical fit of the model</td>
+                </tr>
+                <tr>
+                    <td>Coherence</td>
+                    <td>To evaluate semantic interpretability of topics</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div id="Quiz" class="tabcontent">
+        <h2>Practice Quiz</h2>
+        
+        <div id="quiz-progress">
+            <p>Question <span id="current-question">1</span> of <span id="total-questions">10</span></p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar">10%</div>
+            </div>
+            <p id="quiz-score">Score: 0/0</p>
+        </div>
+        
+        <div class="quiz-container">
+            <div class="question active" id="q1">
+                <h3>Question 1:</h3>
+                <p>What is the final step after training and validating a machine learning model?</p>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="a"> Model deployment</label>
+                    <label><input type="radio" name="q1" value="b"> Reminding the problem statement</label>
+                    <label><input type="radio" name="q1" value="c"> Data preprocessing</label>
+                    <label><input type="radio" name="q1" value="d"> Feature extraction</label>
+                </div>
+                <div class="feedback" id="feedback-q1"></div>
+            </div>
+            
+            <div class="question" id="q2">
+                <h3>Question 2:</h3>
+                <p>Which metric is specifically used for machine translation evaluation?</p>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="a"> Word Error Rate</label>
+                    <label><input type="radio" name="q2" value="b"> BLEU Score</label>
+                    <label><input type="radio" name="q2" value="c"> Precision</label>
+                    <label><input type="radio" name="q2" value="d"> Accuracy</label>
+                </div>
+                <div class="feedback" id="feedback-q2"></div>
+            </div>
+            
+            <div class="question" id="q3">
+                <h3>Question 3:</h3>
+                <p>In the context of evaluation, what does ROC-AUC represent?</p>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="a"> Data transformation method</label>
+                    <label><input type="radio" name="q3" value="b"> True and false positive rate thresholding</label>
+                    <label><input type="radio" name="q3" value="c"> Neural network layer</label>
+                    <label><input type="radio" name="q3" value="d"> Sentence embedding model</label>
+                </div>
+                <div class="feedback" id="feedback-q3"></div>
+            </div>
+            
+            <div class="question" id="q4">
+                <h3>Question 4:</h3>
+                <p>What is SMOTE used for in imbalanced data handling?</p>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="a"> Data normalization</label>
+                    <label><input type="radio" name="q4" value="b"> Generating synthetic samples for minority classes</label>
+                    <label><input type="radio" name="q4" value="c"> Model accuracy evaluation</label>
+                    <label><input type="radio" name="q4" value="d"> Creating classification models</label>
+                </div>
+                <div class="feedback" id="feedback-q4"></div>
+            </div>
+            
+            <div class="question" id="q5">
+                <h3>Question 5:</h3>
+                <p>What does k-fold cross-validation aim to achieve?</p>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="a"> High data redundancy</label>
+                    <label><input type="radio" name="q5" value="b"> Reuse of all data for both training and testing</label>
+                    <label><input type="radio" name="q5" value="c"> Elimination of validation</label>
+                    <label><input type="radio" name="q5" value="d"> One-time testing</label>
+                </div>
+                <div class="feedback" id="feedback-q5"></div>
+            </div>
+            
+            <div class="question" id="q6">
+                <h3>Question 6:</h3>
+                <p>What does the F1 Score measure?</p>
+                <div class="options">
+                    <label><input type="radio" name="q6" value="a"> Data relevance</label>
+                    <label><input type="radio" name="q6" value="b"> Harmonic mean of precision and recall</label>
+                    <label><input type="radio" name="q6" value="c"> Linear regression</label>
+                    <label><input type="radio" name="q6" value="d"> Sum of precision and recall</label>
+                </div>
+                <div class="feedback" id="feedback-q6"></div>
+            </div>
+            
+            <div class="question" id="q7">
+                <h3>Question 7:</h3>
+                <p>What is the initial step in K-means clustering?</p>
+                <div class="options">
+                    <label><input type="radio" name="q7" value="a"> Selecting centroids randomly</label>
+                    <label><input type="radio" name="q7" value="b"> Selecting centroids from the datapoints</label>
+                    <label><input type="radio" name="q7" value="c"> Determining the optimal number of clusters</label>
+                    <label><input type="radio" name="q7" value="d"> Calculating distances between points</label>
+                </div>
+                <div class="feedback" id="feedback-q7"></div>
+            </div>
+            
+            <div class="question" id="q8">
+                <h3>Question 8:</h3>
+                <p>Which of the following statements is true about K-means?</p>
+                <div class="options">
+                    <label><input type="radio" name="q8" value="a"> It always converges to a global minimum</label>
+                    <label><input type="radio" name="q8" value="b"> It converges to a local minimum</label>
+                    <label><input type="radio" name="q8" value="c"> It does not converge</label>
+                    <label><input type="radio" name="q8" value="d"> It uses supervised learning</label>
+                </div>
+                <div class="feedback" id="feedback-q8"></div>
+            </div>
+            
+            <div class="question" id="q9">
+                <h3>Question 9:</h3>
+                <p>Which technique is used for handling imbalanced data?</p>
+                <div class="options">
+                    <label><input type="radio" name="q9" value="a"> Outlier Detection</label>
+                    <label><input type="radio" name="q9" value="b"> Under sampling</label>
+                    <label><input type="radio" name="q9" value="c"> Cross-validation</label>
+                    <label><input type="radio" name="q9" value="d"> Data Fusion</label>
+                </div>
+                <div class="feedback" id="feedback-q9"></div>
+            </div>
+            
+            <div class="question" id="q10">
+                <h3>Question 10:</h3>
+                <p>Why is Naive Bayes popular in text classification?</p>
+                <div class="options">
+                    <label><input type="radio" name="q10" value="a"> It always produces the most accurate results</label>
+                    <label><input type="radio" name="q10" value="b"> It is simple and works well with high-dimensional data</label>
+                    <label><input type="radio" name="q10" value="c"> It uses neural networks</label>
+                    <label><input type="radio" name="q10" value="d"> It requires no training data</label>
+                </div>
+                <div class="feedback" id="feedback-q10"></div>
+            </div>
+            
+            <button id="submit-btn">Submit Answer</button>
+            <button id="next-btn" style="display: none;">Next Question</button>
+            <button id="restart-btn" style="display: none;">Restart Quiz</button>
+        </div>
+        
+        <div class="section">
+            <h3>Short Answer Questions</h3>
+            
+            <details>
+                <summary>Complete the sentence: Dropout and L1/L2 are ________ techniques used to prevent overfitting to noise.</summary>
+                <div class="toggle-content">
+                    <p><strong>Answer:</strong> regularization</p>
+                    <p><strong>Explanation:</strong> Dropout and L1/L2 regularization are techniques that help prevent models from being too complex and fitting to noise in the training data.</p>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Complete the sentence: _________ measures the overall correctness of a model's predictions in classification problem.</summary>
+                <div class="toggle-content">
+                    <p><strong>Answer:</strong> Accuracy</p>
+                    <p><strong>Explanation:</strong> Accuracy is the ratio of correctly predicted observations to the total observations, measuring the overall correctness of a model's predictions.</p>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Name two hyperparameter tuning approaches.</summary>
+                <div class="toggle-content">
+                    <p><strong>Answer:</strong> Grid Search, Random Search</p>
+                    <p><strong>Explanation:</strong> Other valid answers might include Bayesian Optimization, Genetic Algorithms, or Gradient-based optimization.</p>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Complete the sentence: In supervised learning, models are trained using a ________ dataset.</summary>
+                <div class="toggle-content">
+                    <p><strong>Answer:</strong> labeled</p>
+                    <p><strong>Explanation:</strong> Supervised learning requires a dataset where each example has a known output or label that the model tries to predict.</p>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Complete the sentence: K-means is sensitive to the initial choice of ________, which can affect its convergence.</summary>
+                <div class="toggle-content">
+                    <p><strong>Answer:</strong> centroids</p>
+                    <p><strong>Explanation:</strong> The initial positions of cluster centers (centroids) can significantly impact the final clustering solution in K-means.</p>
+                </div>
+            </details>
+        </div>
+        
+        <div class="section">
+            <h3>Extended Response Questions</h3>
+            
+            <details>
+                <summary>Mention three performance metrics for regression and three performance metrics for classification.</summary>
+                <div class="toggle-content">
+                    <p><strong>Regression metrics:</strong></p>
+                    <ul>
+                        <li>Mean Squared Error (MSE)</li>
+                        <li>Root Mean Squared Error (RMSE)</li>
+                        <li>Mean Absolute Error (MAE)</li>
+                        <li>R-squared (R²)</li>
+                        <li>Adjusted R-squared</li>
+                        <li>Mean Absolute Percentage Error (MAPE)</li>
+                    </ul>
+                    <p><strong>Classification metrics:</strong></p>
+                    <ul>
+                        <li>Accuracy</li>
+                        <li>Precision</li>
+                        <li>Recall (Sensitivity)</li>
+                        <li>F1 Score</li>
+                        <li>Specificity</li>
+                        <li>ROC-AUC</li>
+                        <li>Confusion Matrix</li>
+                        <li>Log Loss</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <details>
+                <summary>What is the difference between kmeans and kmeans++? What is the benefit of using kmeans++ instead of kmeans?</summary>
+                <div class="toggle-content">
+                    <p><strong>Difference:</strong></p>
+                    <p>The main difference between K-means and K-means++ is in the initialization of cluster centroids:</p>
+                    <ul>
+                        <li><strong>K-means</strong> initializes the centroids randomly, which can lead to poor clustering if the initial points are not well distributed.</li>
+                        <li><strong>K-means++</strong> uses a smarter initialization strategy where the first centroid is chosen randomly, and subsequent centroids are selected with probability proportional to their squared distance from the closest existing centroid.</li>
+                    </ul>
+                    <p><strong>Benefits of K-means++:</strong></p>
+                    <ul>
+                        <li>Better initial cluster centers that are well-spread across the data</li>
+                        <li>Faster convergence to a solution</li>
+                        <li>More consistent results across different runs of the algorithm</li>
+                        <li>Often produces a better final clustering solution with lower overall inertia</li>
+                        <li>Reduced sensitivity to the initial random state</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Why is clustering preferred over classification for analyzing web data?</summary>
+                <div class="toggle-content">
+                    <p>Clustering is often preferred over classification for web data analysis for several reasons:</p>
+                    <ol>
+                        <li><strong>No labeled data required:</strong> Web data is vast and constantly changing, making manual labeling impractical and expensive. Clustering can discover patterns without requiring labeled examples.</li>
+                        <li><strong>Discovery of unknown patterns:</strong> Web data often contains emerging trends or categories that aren't predefined. Clustering can uncover these naturally occurring groups.</li>
+                        <li><strong>Scalability:</strong> Clustering algorithms can efficiently process large volumes of web data without requiring extensive training.</li>
+                        <li><strong>Adaptability to change:</strong> Web content evolves rapidly, and clustering can adapt to new or emerging categories without requiring model retraining.</li>
+                        <li><strong>Exploratory analysis:</strong> Clustering provides an effective way to understand the structure and composition of web data before applying more specific models.</li>
+                        <li><strong>Handling diverse content:</strong> Web data is heterogeneous, and clustering can group similar items even when the overall collection is diverse.</li>
+                    </ol>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Why is Naive Bayes a popular model in classification, and most of the time we use it as a baseline?</summary>
+                <div class="toggle-content">
+                    <p>Naive Bayes is a popular model in classification and commonly used as a baseline for several reasons:</p>
+                    <ol>
+                        <li><strong>Simplicity:</strong> It's easy to implement and understand, making it accessible for quick prototyping and benchmarking.</li>
+                        <li><strong>Efficiency:</strong> It trains extremely quickly compared to more complex models, especially with large datasets.</li>
+                        <li><strong>Performance with limited data:</strong> It can perform reasonably well even with relatively small training datasets.</li>
+                        <li><strong>Handles high-dimensional data:</strong> It works well with text data which typically has high dimensionality (many features).</li>
+                        <li><strong>Probabilistic outputs:</strong> It provides probability scores for predictions, not just class labels.</li>
+                        <li><strong>Low computational requirements:</strong> It has minimal memory and processing needs.</li>
+                        <li><strong>Surprisingly good results:</strong> Despite its "naive" independence assumption, it often performs competitively on many NLP tasks.</li>
+                    </ol>
+                    <p>As a baseline, it establishes a performance floor that more complex models should exceed to justify their additional complexity and computational cost.</p>
+                </div>
+            </details>
+            
+            <details>
+                <summary>Explain why K-means might converge to a local minimum instead of a global minimum.</summary>
+                <div class="toggle-content">
+                    <p>K-means converges to a local minimum rather than a global minimum for several reasons:</p>
+                    <ol>
+                        <li><strong>Dependency on initialization:</strong> The final clustering solution depends heavily on the initial placement of centroids. Different initializations can lead to different final clusterings.</li>
+                        <li><strong>Greedy algorithm:</strong> K-means makes locally optimal choices at each step without considering the global impact of these decisions. It assigns points to the nearest centroid and then updates centroids based on these assignments.</li>
+                        <li><strong>Non-convex objective function:</strong> The objective function (minimizing the sum of squared distances) is non-convex, meaning it has multiple local minima.</li>
+                        <li><strong>Iterative nature:</strong> The algorithm stops when assignments no longer change or when a maximum number of iterations is reached, which may occur before finding the global optimum.</li>
+                        <li><strong>Limited exploration:</strong> K-means doesn't explore the entire solution space but rather follows a fixed path determined by the initial centroids.</li>
+                    </ol>
+                    <p>To mitigate this issue, K-means is often run multiple times with different initializations, and the solution with the lowest inertia (sum of squared distances) is selected. This approach increases the chance of finding a better local minimum, though still not guaranteeing the global minimum.</p>
+                </div>
+            </details>
+            
+            <details>
+                <summary>What are some methods for handling imbalanced textual data in NLP?</summary>
+                <div class="toggle-content">
+                    <p>Methods for handling imbalanced textual data in NLP include:</p>
+                    <ol>
+                        <li><strong>Data-level methods:</strong>
+                            <ul>
+                                <li><strong>Undersampling:</strong> Reducing the number of samples from majority classes</li>
+                                <li><strong>Oversampling:</strong> Increasing samples from minority classes by duplication</li>
+                                <li><strong>SMOTE for text:</strong> Generating synthetic text samples for minority classes</li>
+                                <li><strong>Back-translation:</strong> Translating minority class texts to another language and back to create variations</li>
+                                <li><strong>Data augmentation:</strong> Synonym replacement, random insertion/deletion, word swapping</li>
+                            </ul>
+                        </li>
+                        <li><strong>Algorithm-level methods:</strong>
+                            <ul>
+                                <li><strong>Class weights:</strong> Assigning higher weights to minority classes during training</li>
+                                <li><strong>Cost-sensitive learning:</strong> Adjusting the cost function to penalize misclassifications of minority classes more heavily</li>
+                                <li><strong>Threshold adjustment:</strong> Modifying decision thresholds for class prediction</li>
+                            </ul>
+                        </li>
+                        <li><strong>Ensemble methods:</strong>
+                            <ul>
+                                <li><strong>Bagging:</strong> Training multiple models on balanced subsets and combining their predictions</li>
+                                <li><strong>Boosting with focus on minority classes:</strong> Algorithms like AdaBoost that give more weight to misclassified examples</li>
+                            </ul>
+                        </li>
+                        <li><strong>Evaluation techniques:</strong>
+                            <ul>
+                                <li>Using appropriate metrics like F1-score, precision-recall curves, or ROC-AUC instead of accuracy</li>
+                                <li>Stratified cross-validation to maintain class distribution across folds</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </details>
+        </div>
+    </div>
+    
+    <div id="Flashcards" class="tabcontent">
+        <h2>Flashcards</h2>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is supervised learning?</div>
+            <div class="flashcard-content">A machine learning approach where models are trained on labeled data to learn a mapping from inputs to known outputs.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is unsupervised learning?</div>
+            <div class="flashcard-content">A machine learning approach where models discover patterns from unlabeled data without explicit guidance.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is the difference between clustering and classification?</div>
+            <div class="flashcard-content"><strong>Classification:</strong> Assigning predetermined categories to data (supervised).<br><br><strong>Clustering:</strong> Grouping similar data points without predefined categories (unsupervised).</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is TF-IDF?</div>
+            <div class="flashcard-content">Term Frequency-Inverse Document Frequency is a numerical statistic that reflects the importance of a word in a document relative to a collection of documents. It increases with the number of times a word appears in a document but is offset by the frequency of the word in the corpus.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is the F1 score?</div>
+            <div class="flashcard-content">The harmonic mean of precision and recall, providing a balance between these two metrics. Formula: F1 = 2 * (Precision * Recall) / (Precision + Recall)</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is K-means clustering?</div>
+            <div class="flashcard-content">An unsupervised learning algorithm that partitions data into K distinct clusters by minimizing the variance within each cluster. It iteratively assigns data points to the nearest centroid and then updates centroids based on these assignments.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is SMOTE?</div>
+            <div class="flashcard-content">Synthetic Minority Over-sampling Technique is a method for handling imbalanced datasets by generating synthetic samples for minority classes.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is the difference between precision and recall?</div>
+            <div class="flashcard-content"><strong>Precision:</strong> The ratio of correctly predicted positive observations to the total predicted positives (TP/(TP+FP)).<br><br><strong>Recall:</strong> The ratio of correctly predicted positive observations to all actual positives (TP/(TP+FN)).</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is topic modeling?</div>
+            <div class="flashcard-content">A type of statistical modeling for discovering abstract topics that occur in a collection of documents. It helps organize, understand, and summarize large volumes of text data.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is LDA in topic modeling?</div>
+            <div class="flashcard-content">Latent Dirichlet Allocation is a generative statistical model that assumes documents are mixtures of topics and topics are mixtures of words. It discovers topics by analyzing word co-occurrence patterns across documents.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is k-fold cross-validation?</div>
+            <div class="flashcard-content">A resampling method where the dataset is divided into k subsets, and the model is trained on k-1 subsets and validated on the remaining subset. This process is repeated k times, with each subset used once for validation.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is ROC-AUC?</div>
+            <div class="flashcard-content">The Area Under the Receiver Operating Characteristic curve, which measures a classifier's ability to distinguish between classes across various thresholds. A higher AUC indicates better discrimination.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">Why might K-means converge to a local minimum?</div>
+            <div class="flashcard-content">K-means may converge to a local minimum due to its dependency on initial centroid positions, the greedy nature of the algorithm, and the non-convex objective function with multiple local minima.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is the advantage of K-means++ over standard K-means?</div>
+            <div class="flashcard-content">K-means++ uses a smarter initialization strategy that spreads out initial centroids, leading to faster convergence, more consistent results, and often better final clustering solutions with lower overall inertia.</div>
+        </div>
+        
+        <div class="flashcard" onclick="flipCard(this)">
+            <div class="flashcard-question">What is dimensionality reduction in NLP?</div>
+            <div class="flashcard-content">The process of reducing the number of features while preserving essential information, which helps with visualization, computational efficiency, and mitigating the curse of dimensionality.</div>
+        </div>
+    </div>
+    
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        // Open the default tab
+        document.getElementById("defaultOpen").click();
+        
+        // Quiz functionality
+        let currentQuestion = 1;
+        const totalQuestions = 10;
+        let score = 0;
+        let answered = 0;
+        
+        document.getElementById("total-questions").textContent = totalQuestions;
+        
+        const correctAnswers = {
+            q1: "a", // Model deployment
+            q2: "b", // BLEU Score
+            q3: "b", // True and false positive rate thresholding
+            q4: "b", // Generating synthetic samples for minority classes
+            q5: "b", // Reuse of all data for both training and testing
+            q6: "b", // Harmonic mean of precision and recall
+            q7: "a", // Selecting centroids randomly
+            q8: "b", // It converges to a local minimum
+            q9: "b", // Under sampling
+            q10: "b" // It is simple and works well with high-dimensional data
+        };
+        
+        const explanations = {
+            q1: "After training and validating a machine learning model, the final step is model deployment, where the model is put into production to make predictions on new data.",
+            q2: "BLEU (Bilingual Evaluation Understudy) Score is specifically designed for evaluating machine translation quality by comparing a candidate translation to one or more reference translations.",
+            q3: "ROC-AUC represents the Area Under the Receiver Operating Characteristic curve, which plots the true positive rate against the false positive rate at various threshold settings.",
+            q4: "SMOTE (Synthetic Minority Over-sampling Technique) is used to handle imbalanced datasets by generating synthetic samples for minority classes.",
+            q5: "K-fold cross-validation aims to reuse all available data for both training and testing by dividing the data into k folds and using each fold once for testing while the remaining k-1 folds are used for training.",
+            q6: "The F1 Score measures the harmonic mean of precision and recall, providing a balance between these two metrics.",
+            q7: "The initial step in standard K-means clustering is selecting centroids randomly. In K-means++, the first centroid is chosen randomly, and subsequent centroids are selected with probability proportional to their squared distance from existing centroids.",
+            q8: "K-means converges to a local minimum, not necessarily a global minimum, due to its dependence on the initial centroid positions.",
+            q9: "Under sampling is a technique for handling imbalanced data by reducing the number of instances from the majority class.",
+            q10: "Naive Bayes is popular in text classification because it is simple to implement and works well with high-dimensional data, which is common in text classification tasks."
+        };
+        
+        document.getElementById("submit-btn").addEventListener("click", function() {
+            const questionId = `q${currentQuestion}`;
+            const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+            
+            if (selectedOption) {
+                const userAnswer = selectedOption.value;
+                const correct = userAnswer === correctAnswers[questionId];
+                
+                if (correct) {
+                    score++;
+                    document.getElementById(`feedback-${questionId}`).innerHTML = `<span class="correct">Correct!</span> ${explanations[questionId]}`;
+                } else {
+                    document.getElementById(`feedback-${questionId}`).innerHTML = `<span class="incorrect">Incorrect.</span> ${explanations[questionId]}`;
+                }
+                
+                answered++;
+                document.getElementById("quiz-score").textContent = `Score: ${score}/${answered}`;
+                
+                // Disable all options and hide submit button
+                const options = document.querySelectorAll(`input[name="${questionId}"]`);
+                options.forEach(option => {
+                    option.disabled = true;
+                });
+                
+                document.getElementById("submit-btn").style.display = "none";
+                
+                if (currentQuestion < totalQuestions) {
+                    document.getElementById("next-btn").style.display = "inline-block";
+                } else {
+                    document.getElementById("restart-btn").style.display = "inline-block";
+                }
+            } else {
+                alert("Please select an answer.");
+            }
+        });
+        
+        document.getElementById("next-btn").addEventListener("click", function() {
+            // Hide current question and show next
+            document.getElementById(`q${currentQuestion}`).classList.remove("active");
+            currentQuestion++;
+            document.getElementById(`q${currentQuestion}`).classList.add("active");
+            
+            // Update progress
+            document.getElementById("current-question").textContent = currentQuestion;
+            const progressPercentage = (currentQuestion / totalQuestions) * 100;
+            document.getElementById("progress-bar").style.width = `${progressPercentage}%`;
+            document.getElementById("progress-bar").textContent = `${Math.round(progressPercentage)}%`;
+            
+            // Hide next button and show submit button
+            document.getElementById("next-btn").style.display = "none";
+            document.getElementById("submit-btn").style.display = "inline-block";
+        });
+        
+        document.getElementById("restart-btn").addEventListener("click", function() {
+            // Reset quiz
+            currentQuestion = 1;
+            score = 0;
+            answered = 0;
+            
+            // Update display
+            document.getElementById("current-question").textContent = currentQuestion;
+            document.getElementById("quiz-score").textContent = "Score: 0/0";
+            document.getElementById("progress-bar").style.width = "10%";
+            document.getElementById("progress-bar").textContent = "10%";
+            
+            // Show first question and hide others
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionElem = document.getElementById(`q${i}`);
+                if (i === 1) {
+                    questionElem.classList.add("active");
+                } else {
+                    questionElem.classList.remove("active");
+                }
+                
+                // Clear feedback
+                document.getElementById(`feedback-q${i}`).innerHTML = "";
+                
+                // Enable options
+                const options = document.querySelectorAll(`input[name="q${i}"]`);
+                options.forEach(option => {
+                    option.disabled = false;
+                    option.checked = false;
+                });
+            }
+            
+            // Show submit button and hide restart button
+            document.getElementById("submit-btn").style.display = "inline-block";
+            document.getElementById("restart-btn").style.display = "none";
+        });
+        
+        function flipCard(card) {
+            card.classList.toggle("flipped");
+        }
+    </script>
+</body>
+</html>
