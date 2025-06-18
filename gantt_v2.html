@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsightGenie Project Gantt Chart</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1a202c;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+        }
+        
+        .container {
+            margin:10px;
+            width: calc(100vw - 20px);
+            height: calc(100vh - 20px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            margin-bottom: 8px;
+        }
+        
+        h1 {
+            color: #1a202c;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 16px 24px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        #gantt-chart {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            margin: 0 24px 24px 24px;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gantt-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            display: flex;
+            margin-bottom: 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+            min-width: 1200px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .gantt-header-label {
+            width: 240px;
+            font-weight: 600;
+            padding: 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: sticky;
+            left: 0;
+            z-index: 20;
+            color: #374151;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+            border-radius: 12px 0 0 0;
+        }
+        
+        .gantt-header-timeline {
+            flex: 1;
+            display: flex;
+            overflow-x: visible;
+            min-width: 0;
+            position: relative;
+        }
+        
+        .gantt-day {
+            min-width: 20px;
+            text-align: center;
+            padding: 8px 0;
+            flex-shrink: 0;
+            position: relative;
+            width: 20px;
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .gantt-week {
+            min-width: 70px;
+            text-align: center;
+            padding: 8px 0;
+            flex-shrink: 0;
+            position: relative;
+            background: rgba(248, 250, 252, 0.8);
+            border-right: 1px solid #e5e7eb;
+            font-size: 0.75rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .gantt-day:nth-child(odd) {
+            background: rgba(249, 250, 251, 0.5);
+        }
+        .gantt-month-separator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            border-left: 3px solid #e5e7eb;
+            opacity: 0.7;
+        }
+        
+        .gantt-month-label {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .gantt-row {
+            display: flex;
+            margin-bottom: 2px;
+            align-items: center;
+            min-width: 1200px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .gantt-row:hover {
+            background: rgba(249, 250, 251, 0.8);
+        }
+        
+        .gantt-section {
+            position: sticky;
+            left: 0;
+            z-index: 15;
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+            color: white;
+            margin-top: 0;
+            margin-bottom: 0;
+            min-width: 1200px;
+            display: flex;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gantt-section::before {
+            content: attr(data-name);
+            margin-left: 240px;
+        }
+        
+        .gantt-label {
+            width: 240px;
+            padding: 12px 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.95);
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            border-right: 1px solid #e5e7eb;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        
+        .gantt-timeline {
+            flex: 1;
+            display: flex;
+            position: relative;
+            min-height: 40px;
+            min-width: 0;
+            overflow: visible;
+        }
+        
+        .gantt-bar-wrapper {
+            position: absolute;
+            top: 8px;
+            height: 24px;
+            max-width: 100%;
+        }
+        
+        .gantt-bar {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); */
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        
+        .gantt-bar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .gantt-bar-milestone {
+            height: 20px;
+            width: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            border-radius: 4px;
+            transform: translateX(-10px) rotate(45deg);
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+        
+        .gantt-bar-milestone::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 2px;
+        }
+        
+        .gantt-bar-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gantt-bar-phase-1---project-initiation {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .gantt-bar-phase-1---development {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .gantt-bar-phase-1---testing {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .gantt-bar-phase-2---uat---deployment {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        
+
+        
+        .gantt-section[data-phase="1"] {
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+        }
+        
+        .gantt-section[data-phase="2"] {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+        
+        .gantt-bar-milestone.payment {
+            height: 28px;
+            width: 28px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 50%;
+            transform: translateX(-14px) rotate(0deg);
+            border: 4px solid #fbbf24;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            animation: pulse-payment 2s infinite;
+        }
+        
+        .gantt-bar-milestone.payment::after {
+            content: '$';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            height: auto;
+            background: transparent;
+            border-radius: 0;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 12px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes pulse-payment {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+        }
+        .milestone {
+            position: relative;
+        }
+        .milestone-marker {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid red;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.2s ease;
+        }
+        
+        .legend-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .legend-color {
+            width: 24px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .legend-milestone {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .task-info {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 100;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: none;
+            min-width: 250px;
+        }
+        
+        .task-info h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #1a202c;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .task-info p {
+            margin: 6px 0;
+            color: #4a5568;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+                margin-bottom: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            
+            .legend {
+                flex-direction: column;
+                gap: 8px;
+                align-items: stretch;
+            }
+            
+            .legend-item {
+                margin: 0;
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+            
+            .gantt-label {
+                width: 140px;
+                font-size: 0.75rem;
+                padding: 8px;
+            }
+            
+            .gantt-day {
+                min-width: 18px;
+                font-size: 0.65rem;
+                padding: 4px 2px;
+            }
+            
+            .gantt-week {
+                font-size: 0.7rem;
+                padding: 6px 4px;
+            }
+            
+            .gantt-bar {
+                height: 20px;
+            }
+            
+            .gantt-bar-label {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+            }
+            
+            button {
+                padding: 12px 16px;
+                font-size: 0.875rem;
+            }
+            
+            .task-info {
+                min-width: 200px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>Project Gantt Chart</h1>
+            <div class="controls">
+                <button id="zoom-in">Zoom In</button>
+                <button id="zoom-out">Zoom Out</button>
+                <button id="reset">Reset</button>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #3498db;"></div>
+                <span>Phase 1 - Project Initiation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #2ecc71;"></div>
+                <span>Phase 1 - Development</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f1c40f;"></div>
+                <span>Phase 1 - Testing</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
+                <span>Phase 2 - UAT & Deployment</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-milestone" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); transform: rotate(45deg); border-radius: 4px;"></div>
+                <span>Milestone</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-milestone payment-legend" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border: 3px solid #fbbf24; box-shadow: 0 0 5px rgba(231, 76, 60, 0.5); border-radius: 50%; transform: none; position: relative;">
+                    <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-weight: bold; font-size: 10px;">$</span>
+                </div>
+                <span>Payment Milestone</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 10px 0; padding: 10px; background-color: #ecf0f1; border-radius: 5px; font-size: 0.9rem;">
+            <strong>Note:</strong> 3-month support period included after Go-Live (not shown in timeline)
+        </div>
+        
+        <div id="gantt-chart">
+            <!-- Gantt chart will be generated here -->
+        </div>
+        
+        <div id="task-info" class="task-info">
+            <h3 id="task-title"></h3>
+            <p><strong>Start:</strong> <span id="task-start"></span></p>
+            <p><strong>End:</strong> <span id="task-end"></span></p>
+            <p><strong>Duration:</strong> <span id="task-duration"></span> days</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Project start date
+            const startDate = new Date('2025-07-01');
+            const endDate = new Date('2025-10-16'); // 16 weeks from start
+            
+            // Configuration
+            let dayWidth = 20; // Initial width of day cells in pixels
+            const minDayWidth = 10;
+            const maxDayWidth = 40;
+            
+            // Tasks data
+            const sections = [
+                {
+                    name: "Phase 1 - Project Initiation",
+                    phase: 1,
+                    tasks: [
+                        { id: "m1", name: "Contract Signing & Kickoff", start: "2025-07-01", duration: 0, milestone: true, payment: false },
+                        { id: "ra", name: "Requirements Analysis", start: "2025-07-01", duration: 4 },
+                        { id: "sad", name: "System Architecture Design", start: "2025-07-05", duration: 2, dependencies: ["ra"] },
+                        { id: "dsd", name: "Database Schema Design", start: "2025-07-07", duration: 1, dependencies: ["sad"] },
+                        { id: "ui", name: "UI/UX Specifications", start: "2025-07-05", duration: 2, dependencies: ["ra"] },
+                        { id: "dd", name: "Design Documentation", start: "2025-07-07", duration: 1, dependencies: ["ui"] }
+                    ]
+                },
+                {
+                    name: "Phase 1 - Development",
+                    phase: 1,
+                    tasks: [
+                        { id: "sde", name: "Setup Development Environment", start: "2025-07-08", duration: 1, dependencies: ["dd"] },
+                        { id: "be", name: "Backend Services & APIs", start: "2025-07-09", duration: 18, dependencies: ["sde"] },
+                        { id: "fe", name: "Frontend Components", start: "2025-07-09", duration: 25, dependencies: ["sde"] },
+                        { id: "dbo", name: "Database Operations", start: "2025-07-27", duration: 9, dependencies: ["be"] },
+                        { id: "sai", name: "Statistical Analysis Integration", start: "2025-07-27", duration: 12, dependencies: ["be"] },
+                        { id: "slm", name: "Self-learning Module", start: "2025-08-03", duration: 9, dependencies: ["fe"] },
+                        { id: "sem", name: "Self-evaluation Module", start: "2025-08-03", duration: 9, dependencies: ["fe"] },
+                        { id: "admin", name: "Admin Configuration & User Mgmt", start: "2025-08-03", duration: 12, dependencies: ["fe"] },
+                        { id: "m3", name: "Development Completion", start: "2025-08-15", duration: 0, milestone: true, dependencies: ["dbo", "sai", "slm", "sem", "admin"] }
+                    ]
+                },
+                {
+                    name: "Phase 1 - Testing",
+                    phase: 1,
+                    tasks: [
+                        { id: "ut", name: "Unit Testing", start: "2025-08-03", duration: 12, dependencies: ["be", "fe"] },
+                        { id: "it", name: "Integration Testing", start: "2025-08-15", duration: 9, dependencies: ["ut"] },
+                        { id: "st", name: "System Testing", start: "2025-08-24", duration: 9, dependencies: ["it"] },
+                        { id: "pst", name: "Performance & Security Testing", start: "2025-09-02", duration: 6, dependencies: ["st"] },
+                        { id: "m4", name: "Phase 1 Payment Milestone", start: "2025-09-08", duration: 0, milestone: true, payment: true, dependencies: ["pst"] }
+                    ]
+                },
+                {
+                    name: "Phase 2 - UAT & Deployment",
+                    phase: 2,
+                    tasks: [
+                        { id: "utc", name: "Prepare UAT Test Cases", start: "2025-09-09", duration: 4, dependencies: ["m4"] },
+                        { id: "uat", name: "User Acceptance Testing", start: "2025-09-13", duration: 17, dependencies: ["utc"] },
+                        { id: "ir", name: "Issue Resolution", start: "2025-09-30", duration: 9, dependencies: ["uat"] },
+                        { id: "m5", name: "UAT Completion", start: "2025-10-09", duration: 0, milestone: true, dependencies: ["ir"] },
+                        { id: "deploy", name: "AWS Deployment", start: "2025-10-10", duration: 4, dependencies: ["m5"] },
+                        { id: "fv", name: "Final Verification", start: "2025-10-14", duration: 2, dependencies: ["deploy"] },
+                        { id: "m6", name: "Go-Live Payment Milestone", start: "2025-10-16", duration: 0, milestone: true, payment: true, dependencies: ["fv"] }
+                    ]
+                }
+            ];
+            
+            // Calculate days between two dates
+            function daysBetween(date1, date2) {
+                const oneDay = 24 * 60 * 60 * 1000;
+                return Math.round(Math.abs((date1 - date2) / oneDay));
+            }
+            
+            // Format date as YYYY-MM-DD
+            function formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+            
+            // Get date by adding days to a date
+            function addDays(date, days) {
+                const result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            }
+            
+            // Generate Gantt chart
+            function generateGanttChart() {
+                const ganttChart = document.getElementById('gantt-chart');
+                ganttChart.innerHTML = '';
+                
+                // Calculate total days in the project
+                const totalDays = daysBetween(startDate, endDate) + 1;
+                
+                // Create header
+                const headerRow = document.createElement('div');
+                headerRow.className = 'gantt-header';
+                
+                const headerLabel = document.createElement('div');
+                headerLabel.className = 'gantt-header-label';
+                headerLabel.textContent = 'Task Name';
+                headerRow.appendChild(headerLabel);
+                
+                const headerTimeline = document.createElement('div');
+                headerTimeline.className = 'gantt-header-timeline';
+                
+                // Generate weeks for header
+                let monthCounter = 1;
+                let weekCounter = 1;
+                for (let i = 0; i < totalDays; i += 7) {
+                    const weekElement = document.createElement('div');
+                    weekElement.className = 'gantt-week';
+                    const weekWidth = Math.max(70, dayWidth * 7); // Ensure minimum width of 70px
+                    weekElement.style.width = `${weekWidth}px`;
+                    weekElement.textContent = `Week ${weekCounter}`;
+                    
+                    // Add month separator every 30 days
+                    if (i % 30 === 0) {
+                        const monthSeparator = document.createElement('div');
+                        monthSeparator.className = 'gantt-month-separator';
+                        
+                        const monthLabel = document.createElement('div');
+                        monthLabel.className = 'gantt-month-label';
+                        monthLabel.textContent = `Month${monthCounter}`;
+                        monthCounter++;
+                        
+                        weekElement.appendChild(monthSeparator);
+                        weekElement.appendChild(monthLabel);
+                    }
+                    
+                    headerTimeline.appendChild(weekElement);
+                    weekCounter++;
+                }
+                headerRow.appendChild(headerTimeline);
+                ganttChart.appendChild(headerRow);
+                
+                // Generate sections and tasks
+                sections.forEach(section => {
+                    // Add section header
+                    const sectionHeader = document.createElement('div');
+                    sectionHeader.className = 'gantt-section';
+                    sectionHeader.setAttribute('data-name', section.name);
+                    if (section.phase) {
+                        sectionHeader.setAttribute('data-phase', section.phase);
+                    }
+                    ganttChart.appendChild(sectionHeader);
+                    
+                    // Add tasks
+                    section.tasks.forEach(task => {
+                        const taskRow = document.createElement('div');
+                        taskRow.className = 'gantt-row';
+                        
+                        const taskLabel = document.createElement('div');
+                        taskLabel.className = 'gantt-label';
+                        taskLabel.textContent = task.name;
+                        taskRow.appendChild(taskLabel);
+                        
+                        const taskTimeline = document.createElement('div');
+                        taskTimeline.className = 'gantt-timeline';
+                        
+                        // Calculate task position
+                        const taskStartDate = new Date(task.start);
+                        const daysFromStart = daysBetween(startDate, taskStartDate);
+                        const leftPosition = daysFromStart * dayWidth;
+                        const width = task.duration * dayWidth;
+                        
+                        // Create task bar
+                        const taskBarWrapper = document.createElement('div');
+                        taskBarWrapper.className = 'gantt-bar-wrapper';
+                        taskBarWrapper.style.left = `${leftPosition}px`;
+                        
+                        if (task.milestone) {
+                            // Milestone
+                            taskBarWrapper.style.width = '20px';
+                            const taskBar = document.createElement('div');
+                            taskBar.className = task.payment ? 'gantt-bar-milestone payment' : 'gantt-bar-milestone';
+                            taskBarWrapper.appendChild(taskBar);
+                        } else {
+                            // Regular task
+                            taskBarWrapper.style.width = `${width}px`;
+                            const taskBar = document.createElement('div');
+                            taskBar.className = `gantt-bar gantt-bar-${kebabCase(section.name)}`;
+                            
+                            // Add label to bars with sufficient width
+                            if (width > 50) {
+                                const taskBarLabel = document.createElement('div');
+                                taskBarLabel.className = 'gantt-bar-label';
+                                taskBarLabel.textContent = task.id;
+                                taskBar.appendChild(taskBarLabel);
+                            }
+                            
+                            taskBarWrapper.appendChild(taskBar);
+                        }
+                        
+                        // Add task data attributes for tooltip
+                        taskBarWrapper.dataset.id = task.id;
+                        taskBarWrapper.dataset.name = task.name;
+                        taskBarWrapper.dataset.start = task.start;
+                        taskBarWrapper.dataset.end = task.duration > 0 ? 
+                            formatDate(addDays(taskStartDate, task.duration - 1)) : task.start;
+                        taskBarWrapper.dataset.duration = task.duration.toString();
+                        
+                        // Add hover effect
+                        taskBarWrapper.addEventListener('mouseenter', showTaskInfo);
+                        taskBarWrapper.addEventListener('mouseleave', hideTaskInfo);
+                        
+                        taskTimeline.appendChild(taskBarWrapper);
+                        taskRow.appendChild(taskTimeline);
+                        ganttChart.appendChild(taskRow);
+                    });
+                });
+            }
+            
+            // Convert string to kebab-case
+            function kebabCase(str) {
+                return str.toLowerCase().replace(/\s+/g, '-');
+            }
+            
+            // Show task info tooltip
+            function showTaskInfo(e) {
+                const taskInfo = document.getElementById('task-info');
+                const taskData = e.currentTarget.dataset;
+                
+                document.getElementById('task-title').textContent = taskData.name;
+                document.getElementById('task-start').textContent = taskData.start;
+                document.getElementById('task-end').textContent = taskData.end;
+                document.getElementById('task-duration').textContent = taskData.duration;
+                
+                // Position tooltip
+                const rect = e.currentTarget.getBoundingClientRect();
+                taskInfo.style.left = `${rect.right + 10}px`;
+                taskInfo.style.top = `${rect.top}px`;
+                taskInfo.style.display = 'block';
+                
+                // Adjust if tooltip goes outside viewport
+                const tooltipRect = taskInfo.getBoundingClientRect();
+                if (tooltipRect.right > window.innerWidth) {
+                    taskInfo.style.left = `${rect.left - tooltipRect.width - 10}px`;
+                }
+            }
+            
+            // Hide task info tooltip
+            function hideTaskInfo() {
+                document.getElementById('task-info').style.display = 'none';
+            }
+            
+            // Initialize zoom controls
+            document.getElementById('zoom-in').addEventListener('click', function() {
+                if (dayWidth < maxDayWidth) {
+                    dayWidth += 5;
+                    generateGanttChart();
+                }
+            });
+            
+            document.getElementById('zoom-out').addEventListener('click', function() {
+                if (dayWidth > minDayWidth) {
+                    dayWidth -= 5;
+                    generateGanttChart();
+                }
+            });
+            
+            document.getElementById('reset').addEventListener('click', function() {
+                dayWidth = 20;
+                generateGanttChart();
+            });
+            
+            // Function to auto-fit timeline to viewport
+            function autoFitTimeline() {
+                const ganttChart = document.getElementById('gantt-chart');
+                const container = document.querySelector('.container');
+                const availableWidth = container.clientWidth - 300; // Subtract task label width
+                const totalDays = daysBetween(startDate, endDate) + 1;
+                const totalWeeks = Math.ceil(totalDays / 7);
+                
+                // Calculate optimal day width to fit all weeks in viewport
+                const optimalDayWidth = Math.floor(availableWidth / totalDays);
+                
+                // Ensure it's within reasonable bounds
+                dayWidth = Math.max(minDayWidth, Math.min(maxDayWidth, optimalDayWidth));
+                
+                generateGanttChart();
+            }
+            
+            // Auto-fit on window resize
+            window.addEventListener('resize', autoFitTimeline);
+            
+            // Initial chart generation with auto-fit
+            autoFitTimeline();
+        });
+    </script>
+</body>
+</html>
