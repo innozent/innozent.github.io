@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Series Prediction Quiz - INFO-6154</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .quiz-progress {
+            background: #ecf0f1;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s ease;
+        }
+        .question-container {
+            display: none;
+            margin-bottom: 30px;
+        }
+        .question-container.active {
+            display: block;
+        }
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+        .equation {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            border-radius: 5px;
+        }
+        .options {
+            margin-bottom: 20px;
+        }
+        .option {
+            display: block;
+            margin: 10px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            background: #e8f4f8;
+            border-color: #3498db;
+        }
+        .option.selected {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        .option.correct {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+        .option.incorrect {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+        .rationale {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+        .rationale.show {
+            display: block;
+        }
+        .rationale h4 {
+            color: #155724;
+            margin-top: 0;
+        }
+        .buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .results {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2ecc71;
+            margin-bottom: 20px;
+        }
+        .score.poor {
+            color: #e74c3c;
+        }
+        .score.average {
+            color: #f39c12;
+        }
+        .question-nav {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .restart-btn {
+            background: #e74c3c;
+            color: white;
+            margin-top: 20px;
+        }
+        .restart-btn:hover {
+            background: #c0392b;
+        }
+        .equation-ref {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Time Series Prediction Quiz</h1>
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 30px;">
+            INFO-6154 Machine Learning Optimization Strategies<br>
+            Week 6 & 7 Review Quiz
+        </p>
+        
+        <div class="quiz-progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="question-nav">
+            <span id="questionNav">Question 1 of 25</span>
+        </div>
+
+        <!-- Questions will be dynamically loaded here -->
+        <div id="quizContainer"></div>
+        
+        <div class="buttons">
+            <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()">Previous</button>
+            <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+        </div>
+        
+        <div class="results" id="results">
+            <h2>Quiz Complete!</h2>
+            <div class="score" id="finalScore">85%</div>
+            <p id="scoreMessage">Great job! You have a solid understanding of time series prediction.</p>
+            <button class="btn restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the primary limitation of using simple regression for time series prediction?",
+                options: [
+                    "It's too computationally expensive",
+                    "Time index (t) alone rarely explains the target well, and lacks memory of temporal sequences",
+                    "It only works with linear data",
+                    "It requires too much data preprocessing"
+                ],
+                correct: 1,
+                rationale: "According to the slides, simple regression on time series fails because the time index (t) alone rarely explains the target well. Temporal patterns depend on previous values, not just time steps. This is why autoregressive models are needed."
+            },
+            {
+                question: "In an autoregressive model, what does the equation ŷₜ = α₁yₜ₋₁ + α₂yₜ₋₂ + ... + αₚyₜ₋ₚ + ε represent?",
+                options: [
+                    "A method to remove seasonality from data",
+                    "A way to predict the next value using prior observations",
+                    "A normalization technique",
+                    "A feature engineering approach"
+                ],
+                correct: 1,
+                rationale: "This is the autoregressive model formula where the next value (ŷₜ) is predicted using prior observations (yₜ₋₁, yₜ₋₂, etc.) with learned weights (α₁, α₂, etc.) plus an error term (ε)."
+            },
+            {
+                question: "What is the main advantage of using sine/cosine encoding for cyclical features like hour of day?",
+                options: [
+                    "It reduces the number of features needed",
+                    "It makes the model train faster",
+                    "It reflects real-world periodicity where Hour=23 and Hour=0 are geometrically close",
+                    "It eliminates the need for normalization"
+                ],
+                correct: 2,
+                rationale: "Sine/cosine encoding maps cyclical variables to a unit circle, making Hour=23 and Hour=0 geometrically close despite being numerically distant. This reflects real-world periodicity that raw integers cannot capture."
+            },
+            {
+                question: "Which type of covariate is known or predictable for future time steps during the forecast period?",
+                options: [
+                    "Static covariates",
+                    "Past covariates",
+                    "Future covariates",
+                    "Dynamic covariates"
+                ],
+                correct: 2,
+                rationale: "Future covariates are known or predictable values for external features that will occur during the forecast period, such as weather forecasts or scheduled events. They must be available for the entire forecast horizon."
+            },
+            {
+                question: "Why is imputation essential for LSTM models in time series?",
+                options: [
+                    "To improve model accuracy",
+                    "To reduce computational cost",
+                    "Because LSTMs cannot accept NaN values",
+                    "To maintain data consistency"
+                ],
+                correct: 2,
+                rationale: "LSTMs cannot accept NaN values, making imputation essential. Additionally, imputation ensures that sequential dependencies are preserved and improves overall performance."
+            },
+            {
+                question: "What is the formula for K-Nearest Neighbors (KNN) imputation?",
+                options: [
+                    "xᵢ,ⱼ = (1/K) × Σ xₖ,ⱼ for k ∈ Neighbors(i)",
+                    "xᵢ,ⱼ = f(Xₖₙₒwₙ, θ) + ε",
+                    "xᵢ,ⱼ = (X - Xₘᵢₙ)/(Xₘₐₓ - Xₘᵢₙ)",
+                    "xᵢ,ⱼ = (X - μ)/σ"
+                ],
+                correct: 0,
+                rationale: "KNN imputation estimates missing values by identifying the K nearest complete records and averaging their values: xᵢ,ⱼ = (1/K) × Σ xₖ,ⱼ for k ∈ Neighbors(i)."
+            },
+            {
+                question: "Which normalization technique is best for data with outliers?",
+                options: [
+                    "Min-Max Scaling",
+                    "Standardization (Z-Score)",
+                    "Robust Scaling",
+                    "Log Transformation"
+                ],
+                correct: 2,
+                rationale: "Robust scaling uses the median and interquartile range (IQR) to minimize the influence of outliers: Xᵣₒᵦᵤₛₜ = (X - Median)/IQR. This makes it the best choice for outlier-prone data."
+            },
+            {
+                question: "What is the window count formula for time series windowing?",
+                options: [
+                    "K = T - N - M + 1",
+                    "K = ⌊(T - N - M)/S⌋ + 1",
+                    "K = T × N × M",
+                    "K = (T + N + M)/S"
+                ],
+                correct: 1,
+                rationale: "The window count formula is K = ⌊(T - N - M)/S⌋ + 1, where T is total time steps, N is input window size, M is output horizon, and S is stride."
+            },
+            {
+                question: "With T=1000, N=48, M=24, and S=1, how many windowed examples do we get?",
+                options: [
+                    "976",
+                    "929",
+                    "952",
+                    "1000"
+                ],
+                correct: 1,
+                rationale: "Using K = ⌊(T - N - M)/S⌋ + 1 = ⌊(1000 - 48 - 24)/1⌋ + 1 = ⌊928/1⌋ + 1 = 929 windowed examples."
+            },
+            {
+                question: "What is the formula for Mean Squared Error (MSE)?",
+                options: [
+                    "MSE = (1/n) × Σ|yᵢ - ŷᵢ|",
+                    "MSE = (1/n) × Σ(yᵢ - ŷᵢ)²",
+                    "MSE = (100%/n) × Σ|yᵢ - ŷᵢ|/yᵢ",
+                    "MSE = 1 - Σ(yᵢ - ŷᵢ)²/Σ(yᵢ - ȳ)²"
+                ],
+                correct: 1,
+                rationale: "MSE = (1/n) × Σ(yᵢ - ŷᵢ)² computes the average of the squares of the differences between predicted and actual values. It penalizes larger errors more heavily."
+            },
+            {
+                question: "What is the main advantage of MAE over MSE?",
+                options: [
+                    "MAE is faster to compute",
+                    "MAE is less sensitive to outliers",
+                    "MAE gives higher accuracy scores",
+                    "MAE works better with small datasets"
+                ],
+                correct: 1,
+                rationale: "MAE is less sensitive to outliers compared to MSE because it uses absolute differences rather than squared differences, making it more robust to extreme values."
+            },
+            {
+                question: "What is the formula for Mean Absolute Percentage Error (MAPE)?",
+                options: [
+                    "MAPE = (1/n) × Σ|yᵢ - ŷᵢ|",
+                    "MAPE = (1/n) × Σ(yᵢ - ŷᵢ)²",
+                    "MAPE = (100%/n) × Σ|yᵢ - ŷᵢ|/yᵢ",
+                    "MAPE = (100%/n) × Σ|yᵢ - ŷᵢ|/((|yᵢ| + |ŷᵢ|)/2)"
+                ],
+                correct: 2,
+                rationale: "MAPE = (100%/n) × Σ|yᵢ - ŷᵢ|/yᵢ measures prediction accuracy as a percentage, making it intuitive and scale-independent."
+            },
+            {
+                question: "What is the main limitation of MAPE?",
+                options: [
+                    "It's computationally expensive",
+                    "It's undefined when yᵢ = 0",
+                    "It only works with positive values",
+                    "It requires normalized data"
+                ],
+                correct: 1,
+                rationale: "MAPE is undefined when yᵢ = 0 because it involves division by the actual value. It's also biased when actual values are very small."
+            },
+            {
+                question: "What is the main purpose of the Darts library?",
+                options: [
+                    "To provide data visualization for time series",
+                    "To simplify time series forecasting with pre-built models and unified interfaces",
+                    "To perform statistical analysis on time series data",
+                    "To clean and preprocess time series data"
+                ],
+                correct: 1,
+                rationale: "Darts is a Python library built on PyTorch that simplifies time series forecasting with pre-built models (RNNs, Transformers, etc.), easy data manipulation via TimeSeries objects, and built-in support for various covariates."
+            },
+            {
+                question: "What is the limitation of Block RNN models regarding covariates?",
+                options: [
+                    "They cannot use any covariates",
+                    "They can only use static covariates",
+                    "They cannot use future covariates",
+                    "They require all covariate types"
+                ],
+                correct: 2,
+                rationale: "Block RNN models cannot use future covariates because predictions are based only on known historical inputs. They can only use past covariates and static covariates."
+            },
+            {
+                question: "What is the formula for Temporal Fusion Transformer (TFT)?",
+                options: [
+                    "ŷₜ₊₁:ₜ₊ₕ = Model(yₜ₋ₗ:ₜ, past_covariates)",
+                    "ŷₜ₊₁:ₜ₊ₕ = TFT(yₜ₋ₗ:ₜ, past_cov, future_cov, static)",
+                    "ŷₜ₊₁:ₜ₊ₕ = RNN(yₜ₋ₗ:ₜ)",
+                    "ŷₜ₊₁:ₜ₊ₕ = LSTM(yₜ₋ₗ:ₜ, static)"
+                ],
+                correct: 1,
+                rationale: "TFT supports all three types of covariates: ŷₜ₊₁:ₜ₊ₕ = TFT(yₜ₋ₗ:ₜ, past_cov, future_cov, static), making it more flexible than Block RNN models."
+            },
+            {
+                question: "What is a key advantage of TFT over Block RNN models?",
+                options: [
+                    "TFT is faster to train",
+                    "TFT requires less memory",
+                    "TFT supports interpretable forecasts via attention weights",
+                    "TFT works with smaller datasets"
+                ],
+                correct: 2,
+                rationale: "TFT provides interpretable forecasts through attention mechanisms and can handle mixed covariate types (static, past, future), offering more transparency than Block RNN models."
+            },
+            {
+                question: "In the cyclical encoding example, what are the sine and cosine values for Hour = 0?",
+                options: [
+                    "sin = 1, cos = 0",
+                    "sin = 0, cos = 1",
+                    "sin = -1, cos = 0",
+                    "sin = 0, cos = -1"
+                ],
+                correct: 1,
+                rationale: "For Hour = 0: sin(2π×0/24) = sin(0) = 0, and cos(2π×0/24) = cos(0) = 1. This places midnight at coordinates (0, 1) on the unit circle."
+            },
+            {
+                question: "What is the typical train-validation-test split ratio for time series?",
+                options: [
+                    "60%-20%-20%",
+                    "70%-15%-15%",
+                    "80%-10%-10%",
+                    "50%-25%-25%"
+                ],
+                correct: 1,
+                rationale: "The typical ratio is 70% training, 15% validation, and 15% test. Importantly, time series data should never be shuffled during splits to avoid data leakage."
+            },
+            {
+                question: "What is the Min-Max scaling formula?",
+                options: [
+                    "X_scaled = (X - μ)/σ",
+                    "X_scaled = (X - X_min)/(X_max - X_min)",
+                    "X_scaled = (X - Median)/IQR",
+                    "X_scaled = log(X + 1)"
+                ],
+                correct: 1,
+                rationale: "Min-Max scaling rescales features to [0,1] range using: X_scaled = (X - X_min)/(X_max - X_min). This is useful when input bounds are known."
+            },
+            {
+                question: "What is the purpose of the input_chunk_length parameter in Darts models?",
+                options: [
+                    "It determines the batch size for training",
+                    "It sets the number of past time steps used for input",
+                    "It controls the forecast horizon",
+                    "It defines the number of features"
+                ],
+                correct: 1,
+                rationale: "input_chunk_length determines the number of past time steps used as input for the model. For example, input_chunk_length=24 means the model uses the past 24 time steps to make predictions."
+            },
+            {
+                question: "What does output_chunk_length represent in Darts models?",
+                options: [
+                    "The number of features to predict",
+                    "The batch size for output",
+                    "The number of future time steps to predict (forecast horizon)",
+                    "The number of model layers"
+                ],
+                correct: 2,
+                rationale: "output_chunk_length represents the forecast horizon - the number of future time steps the model will predict. For example, output_chunk_length=12 means predicting 12 steps into the future."
+            },
+            {
+                question: "What is the advantage of using separate scalers for target and covariates?",
+                options: [
+                    "It reduces computational cost",
+                    "It prevents different scale ranges from interfering with each other",
+                    "It makes the model train faster",
+                    "It improves model interpretability"
+                ],
+                correct: 1,
+                rationale: "Using separate scalers for target and covariates prevents different scale ranges from interfering with each other. This ensures that each type of data is properly normalized according to its own distribution."
+            },
+            {
+                question: "What is the mathematical process in autoencoder imputation?",
+                options: [
+                    "H = f(WX + b), X' = g(W'H + b')",
+                    "X' = KNN(X, K)",
+                    "X' = (X - μ)/σ",
+                    "X' = median(X)"
+                ],
+                correct: 0,
+                rationale: "Autoencoder imputation uses: H = f(WX + b) to create a hidden representation, then X' = g(W'H + b') to reconstruct the output, where missing values are inferred from the learned compressed representation."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let score = 0;
+        let answered = false;
+
+        function initializeQuiz() {
+            loadQuestion();
+            updateProgress();
+            updateNavigation();
+        }
+
+        function loadQuestion() {
+            const container = document.getElementById('quizContainer');
+            const q = questions[currentQuestion];
+            
+            let optionsHTML = '';
+            q.options.forEach((option, index) => {
+                optionsHTML += `
+                    <div class="option" onclick="selectOption(${index})">
+                        ${option}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = `
+                <div class="question-container active">
+                    <div class="question">${q.question}</div>
+                    <div class="options">
+                        ${optionsHTML}
+                    </div>
+                    <div class="rationale" id="rationale">
+                        <h4>Explanation:</h4>
+                        <p>${q.rationale}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Reset answer state
+            answered = false;
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            options[index].classList.add('selected');
+            
+            userAnswers[currentQuestion] = index;
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (answered) return;
+            
+            answered = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, index) => {
+                if (index === q.correct) {
+                    option.classList.add('correct');
+                } else if (index === userAnswers[currentQuestion]) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            document.getElementById('rationale').classList.add('show');
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            
+            if (userAnswers[currentQuestion] === q.correct) {
+                score++;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+                updateProgress();
+                updateNavigation();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+                updateProgress();
+                updateNavigation();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function updateNavigation() {
+            document.getElementById('questionNav').textContent = 
+                `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+        }
+
+        function showResults() {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.querySelector('.buttons').style.display = 'none';
+            document.querySelector('.quiz-progress').style.display = 'none';
+            document.querySelector('.question-nav').style.display = 'none';
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            const scoreElement = document.getElementById('finalScore');
+            const messageElement = document.getElementById('scoreMessage');
+            
+            scoreElement.textContent = percentage + '%';
+            
+            if (percentage >= 80) {
+                scoreElement.className = 'score';
+                messageElement.textContent = 'Excellent! You have a strong understanding of time series prediction concepts.';
+            } else if (percentage >= 60) {
+                scoreElement.className = 'score average';
+                messageElement.textContent = 'Good job! You understand the basics but review some concepts.';
+            } else {
+                scoreElement.className = 'score poor';
+                messageElement.textContent = 'Keep studying! Review the course materials and try again.';
+            }
+            
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = [];
+            score = 0;
+            answered = false;
+            
+            document.getElementById('quizContainer').style.display = 'block';
+            document.querySelector('.buttons').style.display = 'block';
+            document.querySelector('.quiz-progress').style.display = 'block';
+            document.querySelector('.question-nav').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            initializeQuiz();
+        }
+
+        // Initialize the quiz when the page loads
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>
