@@ -57,3 +57,6 @@ temp/
 # Other
 .cache/
 coverage/
+
+# Personal files
+Wiwat Resume.pdf

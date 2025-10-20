@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional Portfolio - Full Stack Developer specializing in Vue.js, JavaScript, and Modern Web Applications">
-    <title>Professional Portfolio</title>
+    <meta name="description" content="Wiwat Pholsomboon - SAP SD/ABAP Consultant & Full Stack Developer with 15+ years experience in SAP development, consulting, and modern web/mobile development">
+    <title>Wiwat Pholsomboon - SAP Consultant & Full Stack Developer</title>
     <style>
         * {
             margin: 0;
@@ -13,12 +13,16 @@
         }
 
         :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
+            --primary-color: #A4193D;
+            --secondary-color: #8B1538;
             --text-dark: #1a202c;
             --text-light: #718096;
-            --bg-light: #f7fafc;
+            --bg-light: #FAFAFA;
             --white: #ffffff;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -31,6 +35,96 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            padding-top: 100px;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 10px 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+            padding: 5px 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+            transition: all 0.3s ease;
         }
 
         .container {
@@ -63,15 +157,16 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: var(--white);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            overflow: hidden;
+            border: 4px solid var(--white);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         h1 {
@@ -112,25 +207,95 @@
 
         .skills-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
 
         .skill-tag {
             background: var(--bg-light);
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 15px 20px;
+            border-radius: 10px;
             text-align: center;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .skill-tag::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            opacity: 0.1;
+            transition: height 0.4s ease;
+            z-index: 0;
+        }
+
+        .skill-tag:hover::before {
+            height: 100%;
         }
 
         .skill-tag:hover {
             border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .skill-name {
+            position: relative;
+            z-index: 1;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .skill-level {
+            position: relative;
+            z-index: 1;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover .skill-level {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .skill-level.expert {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .skill-level.advanced {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .skill-level.intermediate {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .skill-category {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .skill-tag:hover .skill-category {
+            opacity: 1;
         }
 
         .about-text {
@@ -165,6 +330,167 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 50px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item.left {
+            justify-content: flex-end;
+            padding-right: calc(50% + 40px);
+        }
+
+        .timeline-item.right {
+            justify-content: flex-start;
+            padding-left: calc(50% + 40px);
+        }
+
+        .timeline-content {
+            background: var(--white);
+            border: 2px solid var(--bg-light);
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 450px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 2;
+        }
+
+        .timeline-date {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .timeline-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .timeline-subtitle {
+            font-size: 1rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .timeline-description {
+            color: var(--text-light);
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .timeline-description ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .timeline-description li {
+            margin-bottom: 8px;
+        }
+
+        .timeline-type {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .timeline-type.work {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+        }
+
+        .timeline-type.education {
+            background: rgba(118, 75, 162, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .certifications-list {
+            list-style: none;
+        }
+
+        .certifications-list li {
+            padding: 12px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cert-name {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .cert-date {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -175,6 +501,10 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding-top: 80px;
+            }
+
             .container {
                 padding: 40px 25px;
             }
@@ -188,45 +518,350 @@
             }
 
             .skills-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
                 gap: 10px;
+            }
+
+            /* Mobile Navigation */
+            .nav-brand {
+                font-size: 1.1rem;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: var(--white);
+                flex-direction: column;
+                gap: 0;
+                padding: 20px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                transition: left 0.3s ease;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-menu li {
+                padding: 15px 0;
+                border-bottom: 1px solid var(--bg-light);
+            }
+
+            .nav-menu li:last-child {
+                border-bottom: none;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .nav-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -6px);
+            }
+
+            /* Mobile Timeline */
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item.left,
+            .timeline-item.right {
+                justify-content: flex-start;
+                padding-left: 70px;
+                padding-right: 0;
+            }
+
+            .timeline-icon {
+                left: 30px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            .timeline-content {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">WP</div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#skills" class="nav-link">Skills</a></li>
+                <li><a href="#timeline" class="nav-link">Timeline</a></li>
+                <li><a href="#certifications" class="nav-link">Certifications</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="header">
-            <div class="avatar">IZ</div>
-            <h1>Innozent</h1>
-            <p class="tagline">Full Stack Developer | Vue.js Specialist | Modern Web Applications</p>
+            <div class="avatar">
+                <img src="images/avatar.jpg" alt="Wiwat Pholsomboon">
+            </div>
+            <h1>Wiwat Pholsomboon</h1>
+            <p class="tagline">SAP SD/ABAP Consultant | Full Stack Developer | AI/ML Student</p>
         </div>
 
-        <div class="section">
+        <div class="section" id="about">
             <h2 class="section-title">About Me</h2>
             <p class="about-text">
-                Passionate full stack developer with expertise in building modern, scalable web applications.
-                Specialized in Vue.js, JavaScript, and creating intuitive user experiences.
-                I focus on clean code, responsive design, and delivering high-quality solutions
-                that solve real-world problems.
+                Versatile IT professional with 15+ years of progressive experience spanning SAP development, consulting,
+                and full-stack development. Strong foundation in SAP ABAP and SD/DSD modules with extensive ECC 6.0
+                implementation experience. Currently focused on modern web and mobile development while
+                maintaining SAP support capabilities. Pursuing Graduate Certificate in AI/ML at Fanshawe College to
+                expand technical expertise. Available for full-time employment January 2026.
             </p>
         </div>
 
-        <div class="section">
+        <div class="section" id="skills">
             <h2 class="section-title">Technical Skills</h2>
             <div class="skills-grid">
-                <div class="skill-tag">Vue.js</div>
-                <div class="skill-tag">JavaScript</div>
-                <div class="skill-tag">HTML5 & CSS3</div>
-                <div class="skill-tag">Responsive Design</div>
-                <div class="skill-tag">Git & GitHub</div>
-                <div class="skill-tag">Web APIs</div>
-                <div class="skill-tag">Modern UI/UX</div>
-                <div class="skill-tag">Web Performance</div>
+                <div class="skill-tag">
+                    <span class="skill-name">SAP ABAP</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">SAP SD/DSD</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">SAP S/4HANA</span>
+                    <span class="skill-level advanced">Advanced</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">Vue.js</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">Flutter</span>
+                    <span class="skill-level advanced">Advanced</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">C# .NET Core</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">JavaScript</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">TypeScript</span>
+                    <span class="skill-level advanced">Advanced</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">Python</span>
+                    <span class="skill-level advanced">Advanced</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">Java</span>
+                    <span class="skill-level advanced">Advanced</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">Node.js</span>
+                    <span class="skill-level advanced">Advanced</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">RESTful APIs</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">AWS</span>
+                    <span class="skill-level intermediate">Intermediate</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">Azure</span>
+                    <span class="skill-level intermediate">Intermediate</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">SQL Server</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">TensorFlow</span>
+                    <span class="skill-level intermediate">Intermediate</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">PyTorch</span>
+                    <span class="skill-level intermediate">Intermediate</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">LLMs & NLP</span>
+                    <span class="skill-level advanced">Advanced</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">Git & JIRA</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
+                <div class="skill-tag">
+                    <span class="skill-name">VS Code</span>
+                    <span class="skill-level expert">Expert</span>
+                </div>
             </div>
         </div>
 
-        <div class="section">
+        <div class="section" id="timeline">
+            <h2 class="section-title">Career Timeline</h2>
+            <div class="timeline">
+                <!-- 2024-2025: Fanshawe College -->
+                <div class="timeline-item right">
+                    <div class="timeline-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                        </svg>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-type education">Education</span>
+                        <div class="timeline-date">Sep 2024 - Dec 2025</div>
+                        <div class="timeline-title">Graduate Certificate in AI & Machine Learning</div>
+                        <div class="timeline-subtitle">Fanshawe College - London, ON, Canada</div>
+                        <div class="timeline-description">GPA: 4.2/4.0 • Currently in co-op term</div>
+                    </div>
+                </div>
+
+                <!-- 2018-2025: Nexture Company -->
+                <div class="timeline-item left">
+                    <div class="timeline-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 2h4c.55 0 1 .45 1 1v1h5c1.11 0 2 .89 2 2v13c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2V6c0-1.11.89-2 2-2h5V3c0-.55.45-1 1-1zm4 2h-4v1h4V4z"/>
+                        </svg>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-type work">Work Experience</span>
+                        <div class="timeline-date">Jul 2018 - Aug 2025</div>
+                        <div class="timeline-title">Full Stack Developer / IT Specialist</div>
+                        <div class="timeline-subtitle">Nexture Company Limited - Bangkok, Thailand</div>
+                        <div class="timeline-description">
+                            <ul>
+                                <li>Developed and deployed 5+ production web applications using Vue.js, C# .NET Core and 3+ cross-platform mobile applications using Flutter, serving over 300 users</li>
+                                <li>Executed significant SAP ABAP development, including FRICE development for SAP S/4 HANA SD, EWM module</li>
+                                <li>Designed and implemented interfaces for complex data exchange between web applications and SAP systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2017-2018: IConnext Consulting -->
+                <div class="timeline-item right">
+                    <div class="timeline-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 2h4c.55 0 1 .45 1 1v1h5c1.11 0 2 .89 2 2v13c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2V6c0-1.11.89-2 2-2h5V3c0-.55.45-1 1-1zm4 2h-4v1h4V4z"/>
+                        </svg>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-type work">Work Experience</span>
+                        <div class="timeline-date">Jul 2017 - Jun 2018</div>
+                        <div class="timeline-title">SAP SD/DSD Techno-Functional Consultant</div>
+                        <div class="timeline-subtitle">IConnext Consulting Company Limited - Bangkok, Thailand</div>
+                        <div class="timeline-description">
+                            <ul>
+                                <li>Led requirements gathering workshops and configured SAP SD/DSD modules for full-cycle ECC 6.0 implementation</li>
+                                <li>Designed and implemented SAP SD interfaces and mobile web application for sales order creation</li>
+                                <li>Accelerated critical SAP project go-live by rapidly re-engineering core ASP.NET web sales application</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2015-2017: Deloitte -->
+                <div class="timeline-item left">
+                    <div class="timeline-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 2h4c.55 0 1 .45 1 1v1h5c1.11 0 2 .89 2 2v13c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2V6c0-1.11.89-2 2-2h5V3c0-.55.45-1 1-1zm4 2h-4v1h4V4z"/>
+                        </svg>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-type work">Work Experience</span>
+                        <div class="timeline-date">Sep 2015 - Feb 2017</div>
+                        <div class="timeline-title">Senior Consultant</div>
+                        <div class="timeline-subtitle">Deloitte Consulting - Bangkok, Thailand</div>
+                        <div class="timeline-description">
+                            <ul>
+                                <li>Performed dual role as SD functional consultant and ABAP developer across multiple implementation projects</li>
+                                <li>Developed and delivered 13 SAP ABAP programs for the SAP SD/GTM module within 2 months</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2006-2012: Accenture -->
+                <div class="timeline-item right">
+                    <div class="timeline-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 2h4c.55 0 1 .45 1 1v1h5c1.11 0 2 .89 2 2v13c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2V6c0-1.11.89-2 2-2h5V3c0-.55.45-1 1-1zm4 2h-4v1h4V4z"/>
+                        </svg>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-type work">Work Experience</span>
+                        <div class="timeline-date">Mar 2006 - Oct 2012</div>
+                        <div class="timeline-title">Senior Systems Analyst</div>
+                        <div class="timeline-subtitle">Accenture Technology Solutions - Bangkok, Thailand</div>
+                        <div class="timeline-description">
+                            <ul>
+                                <li>Progressed from ABAP Developer to Senior Systems Analyst and team lead over 6 years</li>
+                                <li>Led team of 12 developers delivering 200+ custom development objects for large-scale SAP implementation</li>
+                                <li>Developed Sales Application integrated with SAP SD using Java J2EE web application</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2001-2005: Kasetsart University -->
+                <div class="timeline-item left">
+                    <div class="timeline-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                        </svg>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-type education">Education</span>
+                        <div class="timeline-date">Jun 2001 - Mar 2005</div>
+                        <div class="timeline-title">Bachelor of Science in Computer Science</div>
+                        <div class="timeline-subtitle">Kasetsart University - Bangkok, Thailand</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="certifications">
+            <h2 class="section-title">Recent Certifications</h2>
+            <ul class="certifications-list">
+                <li>
+                    <span class="cert-name">Agentic AI Fundamentals: Architectures, Frameworks, and Applications</span>
+                    <span class="cert-date">01/2025</span>
+                </li>
+                <li>
+                    <span class="cert-name">Generative AI and LLMOps: Building Blocks and Applications</span>
+                    <span class="cert-date">01/2025</span>
+                </li>
+                <li>
+                    <span class="cert-name">Programming with the Gemini Flash API</span>
+                    <span class="cert-date">01/2025</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section" id="contact">
             <h2 class="section-title">Connect With Me</h2>
             <div class="contact-links">
                 <a href="https://github.com/innozent" class="contact-link" target="_blank">
@@ -235,19 +870,134 @@
                     </svg>
                     GitHub
                 </a>
-                <a href="mailto:contact@example.com" class="contact-link">
+                <a href="https://linkedin.com/in/wiwatp" class="contact-link" target="_blank">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.779l5.513-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z"/>
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                     </svg>
-                    Email
+                    LinkedIn
                 </a>
             </div>
         </div>
 
         <div class="footer">
-            <p>&copy; 2025 Innozent. All rights reserved.</p>
-            <p style="margin-top: 10px; font-size: 0.85rem;">Built with passion and clean code</p>
+            <p>&copy; 2025 Wiwat Pholsomboon. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">London, Ontario</p>
         </div>
     </div>
+
+    <script>
+        // Mobile Navigation Toggle
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking a link
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Navbar scroll effect
+        const navbar = document.querySelector('.navbar');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        // Active section highlighting in navigation
+        const sections = document.querySelectorAll('.section');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Intersection Observer for Timeline animations
+        const timelineItems = document.querySelectorAll('.timeline-item');
+
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        timelineItems.forEach(item => {
+            observer.observe(item);
+        });
+
+        // Add animation to sections on scroll
+        const animatedSections = document.querySelectorAll('.section');
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        animatedSections.forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            sectionObserver.observe(section);
+        });
+
+        // Smooth scroll offset for fixed navbar
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
